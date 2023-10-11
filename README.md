@@ -1,2 +1,3 @@
 # x-ops
-DevOps, DataOps,FinOps and AIOps
+
+DevOps, DataOps, FinOps and AIOps.
