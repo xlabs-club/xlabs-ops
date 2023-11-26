@@ -27,4 +27,6 @@
 
 ## TODO
 
+EXTRA_ARGS
+多 Tag
 参考 https://flavio.castelli.me/2020/10/05/build-multi-architecture-container-images-using-argo-workflow/ 实现多架构编译。
