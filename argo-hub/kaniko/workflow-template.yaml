@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: kaniko
+  # namespace: argo-workflows
+  annotations:
+    xlabs-argo-hub/description: 'A template for building Docker images using kaniko'
+spec:
+  entrypoint: main
+  templates:
+    - name: main
+      serviceAccountName: default
+      metadata:
+        annotations:
+          xlabs-argo-hub-template/description: 'A wrapper on top of kaniko CLI'
+      inputs:
+        artifacts:
+          - name: repo
+            path: /tmp/repo
+            git:
+              repo: '{{ inputs.parameters.REPO }}'
+              revision: '{{ inputs.parameters.REVISION }}'
+              depth: 1
+              sshPrivateKeySecret:
+                name: github-creds
+                key: ssh-private-key
+        parameters:
+          - name: REPO
+          - name: REVISION
+            default: 'main'
+          - name: DOCKERFILE
+            default: Dockerfile
+          - name: IMAGE_NAME
+          - name: TAG
+            default: latest
+          - name: CONTEXT
+            default: .
+          - name: PLATFORM
+            default: linux/amd64
+
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: docker-config
+      container:
+        image: bitnami/kaniko:1.18.0
+        workingDir: '{{ inputs.artifacts.repo.path }}'
+        command: ["/kaniko/executor"]
+        args:
+          - --cache
+          - --cache-copy-layers
+          - --cache-repo={{ inputs.parameters.IMAGE_NAME }}-cache
+          - --reproducible
+          - --context={{ inputs.parameters.CONTEXT }}
+          - --custom-platform={{ inputs.parameters.PLATFORM }}
+          - --dockerfile={{ inputs.parameters.DOCKERFILE }}
+          - --destination={{ inputs.parameters.IMAGE_NAME }}:{{ inputs.parameters.TAG }}
+        volumeMounts:
+          - mountPath: /kaniko/.docker/
+            name: docker-config
