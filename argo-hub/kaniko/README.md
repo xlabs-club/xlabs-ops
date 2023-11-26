@@ -24,3 +24,7 @@
 1. 默认配置的 Git 拉取方式是 ssh，填写 repo 地址的时候也需要是 ssh 地址，否则会出现 'invalid auth method' 错误。
 2. 默认编译 `--platforms linux/amd64`，根据需要自行修改。
 3. kaniko 当前还不支持一次性编译多个架构，如果是多架构需要多次编译，然后使用 manifest-tool 合并。
+
+## TODO
+
+参考 https://flavio.castelli.me/2020/10/05/build-multi-architecture-container-images-using-argo-workflow/ 实现多架构编译。
