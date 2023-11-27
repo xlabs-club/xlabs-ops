@@ -29,4 +29,13 @@
 
 EXTRA_ARGS
 多 Tag
+docker pull mplatform/manifest-tool:alpine
+
+```
+$ manifest-tool push from-args \
+    --platforms linux/amd64,linux/arm/v5,linux/arm/v7 \
+    --template foo/bar-ARCH:v1 \
+    --target foo/bar:v1
+```
+
 参考 https://flavio.castelli.me/2020/10/05/build-multi-architecture-container-images-using-argo-workflow/ 实现多架构编译。
