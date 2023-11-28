@@ -8,7 +8,7 @@
 
     ```bash
     # 注意需要的是 private key 文件，不是 pub 文件
-    kubectl --namespace argo-workflows create secret generic github-creds --from-file=ssh-private-key=~/.ssh/id_ed25519
+    kubectl --namespace argo create secret generic github-creds --from-file=ssh-private-key=/your-home/.ssh/id_ed25519
     ```
 
 2. 镜像仓库认证。创建 docker config 挂载给 kaniko pod 使用。
@@ -16,7 +16,7 @@
     ```bash
     echo "{\"auths\":{\"docker.io\":{\"username\":\"username\",\"password\":\"password\"}}}" > config.json
     
-    kubectl --namespace argo-workflows create secret generic docker-config --from-file=config.json
+    kubectl --namespace argo create secret generic docker-config --from-file=config.json
     ```
 
 ## 注意事项
