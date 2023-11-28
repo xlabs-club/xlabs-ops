@@ -20,9 +20,7 @@ spec:
       - name: context
         default: .
       - name: platforms
-        default:
-          - linux/amd64
-          - linux/arm64
+        default: '["linux/amd64","linux/arm64"]'
 
   templates:
     - name: build
@@ -31,8 +29,8 @@ spec:
         annotations:
           xlabs-argo-hub-template/description: 'A wrapper on top of kaniko CLI'
       steps:
-        - - name: build-single-arch
-            template: build-single-arch
+        - - name: build-arch
+            template: build-arch
             arguments:
               parameters:
                 - name: platform
@@ -41,7 +39,7 @@ spec:
         - - name: manifest-tool-combine
             template: manifest-tool-combine
 
-    - name: build-single-arch
+    - name: build-arch
       inputs:
         artifacts:
           - name: repo
