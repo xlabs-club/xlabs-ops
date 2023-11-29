@@ -69,7 +69,7 @@ spec:
           - --context={{ workflow.parameters.context }}
           - --custom-platform={{ inputs.parameters.platform }}
           - --dockerfile={{ workflow.parameters.DOCKERFILE }}
-          - --destination={{ workflow.parameters.IMAGE_NAME }}:{{ workflow.parameters.TAG }}-{{ inputs.parameters.platform }}
+          - --destination={{ workflow.parameters.IMAGE_NAME }}-{{ inputs.parameters.platform }}:{{ workflow.parameters.TAG }}
         volumeMounts:
           - mountPath: /kaniko/.docker/
             name: docker-config
@@ -90,7 +90,7 @@ spec:
           - push from-args
           - --docker-cfg /manifest-tool/.docker/
           - --platforms linux/amd64,linux/arm64
-          - --template {{ workflow.parameters.IMAGE_NAME }}:{{ workflow.parameters.TAG }}-ARCH
+          - --template {{ workflow.parameters.IMAGE_NAME }}-ARCH:{{ workflow.parameters.TAG }}
           - --target {{ workflow.parameters.IMAGE_NAME }}:{{ workflow.parameters.TAG }}
         volumeMounts:
           - mountPath: /manifest-tool/.docker/
