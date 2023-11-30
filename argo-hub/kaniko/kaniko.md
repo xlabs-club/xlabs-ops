@@ -37,9 +37,3 @@ $ manifest-tool push from-args \
     --template foo/bar-ARCH:v1 \
     --target foo/bar:v1
 ```
-
-参考 https://flavio.castelli.me/2020/10/05/build-multi-architecture-container-images-using-argo-workflow/ 实现多架构编译。
-
-git@github.com:l10178/x-container.git
-java
-src/main/docker/base

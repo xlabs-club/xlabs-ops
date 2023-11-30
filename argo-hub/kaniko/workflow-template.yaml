@@ -21,7 +21,10 @@ spec:
         default: .
       - name: platforms
         default: '["linux/amd64","linux/arm64"]'
-
+  ttlStrategy:
+    secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
+    secondsAfterSuccess: 5     # Time to live after workflow is successful
+    secondsAfterFailure: 5     # Time to live after workflow fails
   templates:
     - name: build
       serviceAccountName: default
@@ -57,6 +60,8 @@ spec:
         - name: docker-config
           secret:
             secretName: docker-config
+      nodeSelector:
+        beta.kubernetes.io/arch: "{{inputs.parameters.arch}}"
       container:
         image: bitnami/kaniko:1.18.0
         workingDir: '{{ inputs.artifacts.repo.path }}'
