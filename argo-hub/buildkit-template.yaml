@@ -1,0 +1,74 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: buildkit
+  # namespace: argo
+spec:
+  entrypoint: main
+  ttlStrategy:
+    secondsAfterCompletion: 3600
+    secondsAfterSuccess: 3600
+    secondsAfterFailure: 3600
+  arguments:
+    parameters:
+      - name: repo
+        value: git@github.com:l10178/x-container.git
+      - name: branch
+        value: main
+      - name: path
+        value: /src/main/docker/base
+      - name: image
+        value: harbor.cool.nxest.local/nxest/base-debian:stable-slim
+      - name: platform
+        value: linux/amd64,linux/arm64
+  templates:
+    - name: main
+      inputs:
+        artifacts:
+          - name: repo
+            path: /workspace
+            git:
+              repo: '{{ workflow.parameters.repo }}'
+              revision: '{{ workflow.parameters.branch }}'
+              depth: 1
+              sshPrivateKeySecret:
+                name: github-creds
+                key: ssh-private-key
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: docker-config
+      # metadata:
+      #   annotations:
+      #     container.apparmor.security.beta.kubernetes.io/buildkitd: unconfined
+      container:
+        readinessProbe:
+          exec:
+            command: [ sh, -c, "buildctl debug workers" ]
+        image: moby/buildkit:buildx-stable-1-rootless
+        volumeMounts:
+          - name: docker-config
+            mountPath: /.docker
+        workingDir: /workspace/{{workflow.parameters.path}}
+        env:
+          - name: BUILDKITD_FLAGS
+            value: --oci-worker-no-process-sandbox
+          - name: DOCKER_CONFIG
+            value: /.docker
+        command:
+          - buildctl-daemonless.sh
+        args:
+          - build
+          - --frontend
+          - dockerfile.v0
+          - --local
+          - context=.
+          - --local
+          - dockerfile=.
+          - --opt 
+          - platform={{workflow.parameters.platform}}
+          - --output
+          - type=image,name={{workflow.parameters.image}},push=true
+        # have to add this to fix `[rootlesskit:child ] error: failed to share mount point: /: permission denied`
+        securityContext:
+          privileged: true
