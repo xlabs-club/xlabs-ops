@@ -6,3 +6,5 @@ node_modules
 .vscode
 .impl
 *.log
+tmp
+ztmp

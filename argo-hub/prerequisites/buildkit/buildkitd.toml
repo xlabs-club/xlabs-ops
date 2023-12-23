@@ -1,0 +1,15 @@
+# 自定义buildkitd配置解决自签名证书校验问题
+
+# kubectl --namespace argo create secret generic buildkitd --from-file=buildkitd.toml
+# buildkit:buildx-stable-1-rootless默认用户目录在 /home/user/.config/buildkit/buildkitd.toml
+
+# debug = true
+
+# harbor使用自签名证书，用https，但是忽略证书校验，解决 x509: certificate signed by unknown authority
+[registry."harbor.cool.nxest.local"]
+  http = false
+  insecure = true
+
+# # 仅 http访问
+# [registry."bar.local:8080"]
+#   http = true

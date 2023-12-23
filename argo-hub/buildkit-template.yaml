@@ -1,14 +1,17 @@
+# kubectl --namespace argo create secret generic github-creds --from-file=ssh-private-key=/your-home/.ssh/id_ed25519
+# kubectl --namespace argo create secret generic docker-config --from-file=config.json
+# kubectl --namespace argo create secret generic buildkitd --from-file=buildkitd.toml
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
   name: buildkit
-  # namespace: argo
+  namespace: argo
 spec:
   entrypoint: main
   ttlStrategy:
-    secondsAfterCompletion: 3600
-    secondsAfterSuccess: 3600
-    secondsAfterFailure: 3600
+    secondsAfterCompletion: 86400
+    secondsAfterSuccess: 86400
+    secondsAfterFailure: 86400
   arguments:
     parameters:
       - name: repo
@@ -18,9 +21,11 @@ spec:
       - name: path
         value: /src/main/docker/base
       - name: image
-        value: harbor.cool.nxest.local/nxest/base-debian:stable-slim
+        value: docker.io/nxest/base-debian:stable-slim
       - name: platform
         value: linux/amd64,linux/arm64
+      - name: proxy
+        value: ""
   templates:
     - name: main
       inputs:
@@ -38,21 +43,28 @@ spec:
         - name: docker-config
           secret:
             secretName: docker-config
+        - name: buildkitd
+          secret:
+            secretName: buildkitd
       # metadata:
       #   annotations:
-      #     container.apparmor.security.beta.kubernetes.io/buildkitd: unconfined
+      #     container.apparmor.security.beta.kubernetes.io/buildkit: unconfined
       container:
+        name: buildkit
+        image: moby/buildkit:buildx-stable-1-rootless
         readinessProbe:
           exec:
             command: [ sh, -c, "buildctl debug workers" ]
-        image: moby/buildkit:buildx-stable-1-rootless
         volumeMounts:
           - name: docker-config
             mountPath: /.docker
+          - name: buildkitd
+            mountPath: /.config/buildkit
         workingDir: /workspace/{{workflow.parameters.path}}
         env:
           - name: BUILDKITD_FLAGS
-            value: --oci-worker-no-process-sandbox
+            value: --oci-worker-no-process-sandbox --config /.config/buildkit/buildkitd.toml
+          # 挂载docker config.json以便允许push镜像
           - name: DOCKER_CONFIG
             value: /.docker
         command:
@@ -67,8 +79,15 @@ spec:
           - dockerfile=.
           - --opt 
           - platform={{workflow.parameters.platform}}
+          - --opt 
+          - build-arg:HTTP_PROXY={{workflow.parameters.proxy}}
+          - --opt 
+          - build-arg:HTTPS_PROXY={{workflow.parameters.proxy}}
           - --output
           - type=image,name={{workflow.parameters.image}},push=true
-        # have to add this to fix `[rootlesskit:child ] error: failed to share mount point: /: permission denied`
+        # 解决问题： `[rootlesskit:child ] error: failed to share mount point: /: permission denied`
         securityContext:
           privileged: true
+          # apparmorProfile: unconfined
+          # seccompProfile:
+            # type: unconfined
