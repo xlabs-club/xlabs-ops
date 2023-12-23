@@ -10,6 +10,3 @@
 limactl create --name=arm64 --cpus=1 --memory=2 --arch=aarch64 template://ubuntu
 ```
 
-## Temp
-
-docker pull moby/buildkit:buildx-stable-1-rootless
