@@ -1,0 +1,102 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: kaniko
+  # namespace: argo
+  annotations:
+    xlabs-argo-hub/description: 'A template for building Docker images using kaniko'
+spec:
+  entrypoint: build
+  arguments:
+    parameters:
+      - name: REPO
+      - name: REVISION
+        default: 'main'
+      - name: DOCKERFILE
+        default: Dockerfile
+      - name: IMAGE_NAME
+      - name: TAG
+        default: latest
+      - name: context
+        default: .
+      - name: platforms
+        default: '["linux/amd64","linux/arm64"]'
+  ttlStrategy:
+    secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
+    secondsAfterSuccess: 5     # Time to live after workflow is successful
+    secondsAfterFailure: 5     # Time to live after workflow fails
+  templates:
+    - name: build
+      serviceAccountName: default
+      metadata:
+        annotations:
+          xlabs-argo-hub-template/description: 'A wrapper on top of kaniko CLI'
+      steps:
+        - - name: build-arch
+            template: build-arch
+            arguments:
+              parameters:
+                - name: platform
+                  value: "{{item}}"
+            withParam: "{{workflow.parameters.platforms}}"
+        - - name: manifest-tool-combine
+            template: manifest-tool-combine
+
+    - name: build-arch
+      inputs:
+        artifacts:
+          - name: repo
+            path: /tmp/repo
+            git:
+              repo: '{{ workflow.parameters.REPO }}'
+              revision: '{{ workflow.parameters.REVISION }}'
+              depth: 1
+              sshPrivateKeySecret:
+                name: github-creds
+                key: ssh-private-key
+        parameters:
+          - name: platform
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: docker-config
+      nodeSelector:
+        beta.kubernetes.io/arch: "{{inputs.parameters.arch}}"
+      container:
+        image: bitnami/kaniko:1.18.0
+        workingDir: '{{ inputs.artifacts.repo.path }}'
+        command: ["/kaniko/executor"]
+        args:
+          - --cache
+          - --cache-copy-layers
+          - --cache-repo={{ workflow.parameters.IMAGE_NAME }}-cache
+          - --reproducible
+          - --context={{ workflow.parameters.context }}
+          - --custom-platform={{ inputs.parameters.platform }}
+          - --dockerfile={{ workflow.parameters.DOCKERFILE }}
+          - --destination={{ workflow.parameters.IMAGE_NAME }}-{{ inputs.parameters.platform }}:{{ workflow.parameters.TAG }}
+        volumeMounts:
+          - mountPath: /kaniko/.docker/
+            name: docker-config
+
+    - name: manifest-tool-combine
+      # inputs:
+      #   parameters:
+      #     - name: platform
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: docker-config
+      container:
+        image: mplatform/manifest-tool:alpine
+        workingDir: '/manifest-tool'
+        command: ["manifest-tool"]
+        args:
+          - push from-args
+          - --docker-cfg /manifest-tool/.docker/
+          - --platforms linux/amd64,linux/arm64
+          - --template {{ workflow.parameters.IMAGE_NAME }}-ARCH:{{ workflow.parameters.TAG }}
+          - --target {{ workflow.parameters.IMAGE_NAME }}:{{ workflow.parameters.TAG }}
+        volumeMounts:
+          - mountPath: /manifest-tool/.docker/
+            name: docker-config

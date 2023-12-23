@@ -1,0 +1,10 @@
+{
+    "auths": {
+        "docker.io": {
+            "auth": "base64(username:password)"
+        },
+        "https://index.docker.io/v1/": {
+            "auth": "base64(username:password)"
+        }
+    }
+}
