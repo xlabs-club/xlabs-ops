@@ -1,0 +1,7 @@
+name: xlabs-k8s-starter
+runtime: nodejs
+description: 使用 Pulumi 一键部署一套 Kubernetes 环境，并安装 Keycloak、Argo、Backstage 等平台工程软件
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: kubernetes-typescript
