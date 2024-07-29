@@ -1,0 +1,31 @@
+encryptionsalt: v1:PbZYeTl9NNY=:v1:3qQT7AV6yEP2RKFW:o9nr7AyENQUCAUSN0x2GOulmWDIziA==
+config:
+  xlabs-k8s-starter:argoWorkflowsPostgresqlPassword:
+    secure: v1:qIJUBS+IFTI1+5RM:OWLxJyh5zqHCcQAcIF+WiPCHygVdtaRb12QTTPwPLro=
+  xlabs-k8s-starter:argocdServerAdminPassword:
+    secure: v1:cOCC4r3DXEMlas4y:odPnVfxzZN+kO+FP3684vM6Qml8FyBnPJeXz
+  # 全局 cert-manager ClusterIssuer 名字, 给所有 ingress 使用
+  xlabs-k8s-starter:clusterIssuer: selfsigned-issuer
+  xlabs-k8s-starter:globalPostgresHost:
+    secure: v1:lQfDLr3C/AJt1mYh:6/kqpslOYLrkhog2FuScUZ6Qqi3pb5Zuc7P3mvn2v+dwSw/2PaSxB6U=
+  xlabs-k8s-starter:globalPostgresPassword:
+    secure: v1:jk32dWxA9HcLPz7Z:YxWLukEe8VRl1ZFh1YsIBTfahMRvFrGur7pRjI3m
+  xlabs-k8s-starter:globalPostgresPort:
+    secure: v1:mm4aHQVu8PAGhPLu:6+Nd9+DppmvBHXUN0ifTQVkuNeo=
+  xlabs-k8s-starter:globalPostgresUsername:
+    secure: v1:8G/T636xQanJe45V:67xN6/IZgKsSsbwL/Rfy7UH+TGZbd5wV
+  xlabs-k8s-starter:hostnameSuffix: cool.nxest.local
+  xlabs-k8s-starter:keycloakAdminPassword:
+    secure: v1:qjOZdZEC6iwGK7nc:43vWzK2PriWbDk5Rfx1sH2V135a2hSApNBpY
+  xlabs-k8s-starter:keycloakPostgresqlPassword:
+    secure: v1:+zZ/9uxpUZNOiuaw:KVe8QgIHpWddBHAeR8t3YfpyGRk7t5FUo0FQ
+  kubernetes:context: cool
+  # kubernetes:renderYamlToDirectory: rendered
+  postgresql:host:
+    secure: v1:Z2Y0q+VWImzzDj3l:J1GJd0Bwtk1QzwSupMWJgUBjuMNJ7HyqXn1oMXE918mJKkhUihHweY8=
+  postgresql:password:
+    secure: v1:Gl1LafE5jxeUwDVN:cpkGv+nJtUZ7aERHHGVxd2lkHlmAt1dHoOu3cZse
+  postgresql:port:
+    secure: v1:XSNBxkM4zDGhyY/E:XPDMu+3mSHvnahVyI9Kuz2LnGow=
+  postgresql:username:
+    secure: v1:IR2At3CGou1NJ9AN:BdXGsmgmibKyTkgB2CNnFnJH+At2H/c5

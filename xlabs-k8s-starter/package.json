@@ -1,0 +1,13 @@
+{
+    "name": "xlabs-ops",
+    "main": "index.ts",
+    "devDependencies": {
+        "@types/node": "^20"
+    },
+    "dependencies": {
+        "@pulumi/kubernetes": "^4.15.0",
+        "@pulumi/postgresql": "^3.11.3",
+        "@pulumi/pulumi": "^3.127.0",
+        "@pulumi/tls": "^5.0.4"
+    }
+}
