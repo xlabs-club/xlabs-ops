@@ -5,6 +5,7 @@
 项目结构介绍：
 
 - **argo-hub**: 一些通用 Argo Workflows 模板。
+- **git-extras**: 一些运维常用 Git 脚本，比如如何快速同步两个 Git Repository。
 - **xlabs-k8s-starter**: 使用 Pulumi 作为 IaC 工具，一键部署一套 Kubernetes 环境，并安装 Keycloak、Argo、Backstage 等平台工程软件。
 
 ## xlabs-k8s-starter

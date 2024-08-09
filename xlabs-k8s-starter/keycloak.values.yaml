@@ -1,0 +1,23 @@
+auth:
+  adminUser: "admin"
+  adminPassword: <%= adminPassword %>
+
+ingress:
+  enabled: true
+  tls: true
+  hostname: <%= hostname %>
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+
+production: true
+proxy: "edge"
+
+networkPolicy:
+  enabled: false
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: <%= postgresPassword %>
+    username: "keycloak"
+    password: <%= postgresPassword %>
+    database: "keycloak"
