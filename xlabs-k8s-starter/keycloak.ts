@@ -7,7 +7,7 @@ let config = new pulumi.Config();
 const keycloakRelease = new kubernetes.helm.v3.Release("keycloak", {
     name: "keycloak",
     chart: "oci://registry-1.docker.io/bitnamicharts/keycloak",
-    version: "21.8.0",
+    version: "22.1.0",
     namespace: "keycloak",
     createNamespace: true,
     timeout: 600,
