@@ -1,0 +1,66 @@
+#  kubectl -n kube-system edit deployments.apps traefik  
+#  --providers.kubernetescrd.allowCrossNamespace=true
+# providers:
+#   kubernetesCRD:
+#     enabled: true
+#     allowCrossNamespace: true
+# https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+    traefik.ingress.kubernetes.io/router.middlewares: oauth-errors
+    # 请参考traefik文档确认是否需要调整优先级：https://doc.traefik.io/traefik/routing/routers/#priority
+    # traefik.ingress.kubernetes.io/router.priority: "42"
+  name: oauth-errors-sign-in
+  namespace: oauth2-proxy
+spec:
+  ingressClassName: traefik
+  rules:
+  # 这里host我会用pulumi替换掉，只支持一个host
+  - host: "*.nxest.com"
+    http:
+      paths:
+      - backend:
+          service:
+            name: oauth2-proxy
+            port:
+              name: http
+        path: /oauth2
+        pathType: Prefix
+  tls:
+  - hosts:
+    - "*.nxest.com"
+    secretName: "widles-placeholder-tls"
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth-errors
+  # namespace: oauth2-proxy
+spec:
+  errors:
+    status:
+      - "401-403"
+    service:
+      name: oauth2-proxy
+      namespace: oauth2-proxy
+      port: http
+      # port: 4180
+    query: "/oauth2/sign_in"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-proxy
+  # namespace: oauth2-proxy
+spec:
+  forwardAuth:
+    address: http://oauth2-proxy.oauth2-proxy.svc:4180/oauth2/auth
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-Request-User
+      - Set-Cookie

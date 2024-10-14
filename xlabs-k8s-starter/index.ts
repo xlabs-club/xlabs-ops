@@ -1,5 +1,8 @@
-// export * 即执行，又导出。import仅执行，export无效
+// export * 即执行任务，又能 export，可以进行 pulumi stack output
 export * from "./cert-manager";
 import "./keycloak";
+import "./oauth2-proxy";
 import "./argo-workflows";
 import "./argo-cd";
+import "./backstage";
+import "./coredns-custom";

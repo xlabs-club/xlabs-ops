@@ -7,15 +7,15 @@ let config = new pulumi.Config();
 const argoRelease = new kubernetes.helm.v3.Release("argo-workflows", {
     name: "argo-workflows",
     chart: "oci://registry-1.docker.io/bitnamicharts/argo-workflows",
-    version: "9.1.11",
+    version: "9.1.17",
     namespace: "argo-workflows",
     createNamespace: true,
-    timeout: 600,
+    timeout: 300,
     values: {
         ingress: {
             enabled: true,
             tls: true,
-            hostname: "argo-workflows." + config.require("hostnameSuffix"),
+            hostname: "argo-ws." + config.require("hostnameSuffix"),
             annotations: {
                 "cert-manager.io/cluster-issuer": config.require("clusterIssuer")
             },

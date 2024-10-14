@@ -8,12 +8,10 @@ let config = new pulumi.Config();
 const certManagerRelease = new kubernetes.helm.v3.Release("cert-manager", {
     name: "cert-manager",
     chart: "cert-manager",
-    version: "1.15.1",
+    version: "1.15.3",
     namespace: "cert-manager",
     createNamespace: true,
-    // forceUpdate: true,
-    // recreatePods: true,
-    timeout: 600,
+    timeout: 300,
     repositoryOpts: {
         repo: "https://charts.jetstack.io",
     },
@@ -74,13 +72,10 @@ const clusterIssuer = new kubernetes.apiextensions.CustomResource("selfsigned-is
     { dependsOn: certManagerRelease }
 );
 
-
-export const certManagerVersion = certManagerRelease.version;
 export const clusterIssuerName = clusterIssuer.metadata.name;
 
 // Export CA 证书，便于客户端导入信任证书
-export const caCertificatePem = caCert.certPem;
-
+// export const caCertificatePem = caCert.certPem;
 // mkdir output
 // pulumi stack output caCertificatePem --show-secrets > output/ca.crt.pem
 // Mac import

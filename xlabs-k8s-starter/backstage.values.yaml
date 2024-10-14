@@ -1,0 +1,160 @@
+ingress:
+  enabled: true
+  className: traefik
+  host: <%= hostname %>
+  tls:
+    enabled: true
+    secretName: <%= hostname %>-tls
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+    traefik.ingress.kubernetes.io/router.middlewares: oauth-errors,oauth2-proxy
+    # traefik.ingress.kubernetes.io/router.priority: "10"
+
+backstage:
+  image:
+    registry: docker.io
+    repository: nxest/xlabs-developer-platform
+    tag: dev
+    pullPolicy: Always
+
+  extraEnvVars:
+    # Node.js 忽略https证书校验
+    - name: NODE_TLS_REJECT_UNAUTHORIZED
+      value: "0"
+
+  appConfig: 
+    app:
+      title: xlabs developer platform
+      baseUrl: <%= baseUrl %>
+    organization:
+      name: XLabs
+
+    backend:
+      baseUrl: <%= baseUrl %>
+      database:
+        client: pg
+        connection: 
+          host: "${POSTGRES_HOST}"
+          port: "${POSTGRES_PORT}"
+          user: "${POSTGRES_USER}"
+          password: "${POSTGRES_PASSWORD}"
+      # reading:
+      #   allow:
+      #   - host: demo.backstage.io
+      #     path:
+      #      - /api/graphql/schema
+      auth:
+        dangerouslyDisableDefaultAuthPolicy: true
+        keys:
+          # node -p 'require("crypto").randomBytes(24).toString("base64")'
+          - secret: 8Dv1Q7xdGcUbG+nuBL9RwGRd6dSesaTA
+    # integrations:
+    #   gitlab:
+    #     - host: git.my.com
+    #       token: xxxx
+    #       apiBaseUrl: https://git.my.com/api/v4
+
+    techdocs:
+      builder: 'local' # Alternatives - 'external'
+      generator:
+        runIn: 'local' # Alternatives - `docker` or 'local'
+      publisher:
+        type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+
+    # kubernetes:
+    #   serviceLocatorMethod:
+    #     type: 'multiTenant'
+    #   clusterLocatorMethods:
+    #     - type: 'config'
+    #       clusters:
+    #         - url: https://kubernetes.default.svc
+    #           name: k3s
+    #           authProvider: 'serviceAccount'
+    #           skipTLSVerify: true
+    #           skipMetricsLookup: true
+
+    permission:
+      enabled: false
+      auth:
+        dangerouslyDisableDefaultAuthPolicy: true
+        # 这种配置方式已过时，切换到新的pluginKeyStore/externalAccess?
+        keys:
+          # node -p 'require("crypto").randomBytes(24).toString("base64")'
+          - secret: 8Dv1Q7xdGcUbG+nuBL9RwGRd6dSesaTA
+      rbac:
+        pluginsWithPermission:
+          - catalog
+        admin:
+          superUsers:
+            - name: group:default/admin
+          users:
+            # - name: user:default/x-man
+            - name: group:default/admin
+    # proxy:
+    #   endpoints:
+    #     '/egress-api-service':
+    #       target: http://192.168.0.1/egress-api-service
+    #       credentials: require
+    #       allowedHeaders: ['Authorization','x-forwarded-user','X-Forwarded-Access-Token']
+
+    auth:
+      environment: production
+      session:
+        secret: a-secret-for-sessions
+      providers:
+        oauth2Proxy: 
+          signIn:
+            resolvers:
+              - resolver: emailMatchingUserEntityProfileEmail
+              - resolver: emailLocalPartMatchingUserEntityName
+              - resolver: forwardedUserMatchingUserEntityName
+    catalog:
+      providers:
+        gitlab:
+          defaultProviderId:
+            host: git.my.com # Identifies one of the hosts set up in the integrations
+            branch: main # Optional. Used to discover on a specific branch
+            fallbackBranch: master # Optional. Fallback to be used if there is no default branch configured at the Gitlab repository. It is only used, if `branch` is undefined. Uses `master` as default
+            skipForkedRepos: false # Optional. If the project is a fork, skip repository
+            group: devops # Optional. Group and subgroup (if needed) to look for repositories. If not present the whole instance will be scanned
+            entityFilename: catalog-info.yaml # Optional. Defaults to `catalog-info.yaml`
+            projectPattern: '[\s\S]*' 
+            excludeRepos: [] 
+            schedule: 
+              frequency: { minutes: 30 }
+              timeout: { minutes: 3 }
+        keycloakOrg:
+          default:
+            baseUrl: <%= keycloakBaseUrl %>
+            loginRealm: devops
+            realm: devops
+            clientId: backstage
+            clientSecret: EBvO09iPK6x2MSrQFcoykGNewUAHsnAv
+            schedule:
+              frequency: { minutes: 10 }
+              timeout: { minutes: 10 }
+              initialDelay: { seconds: 15 }
+      rules:
+        - allow: [Template, Component, System, Domain, API, Resource, Location, User, Group]
+      locations:
+        - type: url
+          target: https://github.com/backstage/demo/blob/master/catalog-info.yaml
+
+postgresql:
+  enabled: true
+  auth:
+    username: backstage
+    password: <%= postgresPassword %>
+    postgresPassword: <%= postgresPassword %>
+    database: backstage
+    # -- The secret keys Postgres will look for to retrieve the relevant password
+    secretKeys:
+      # -- The key in which Postgres will look for, for the admin password, in the existing Secret
+      adminPasswordKey: postgres-password
+      # -- The key in which Postgres will look for, for the user password, in the existing Secret
+      userPasswordKey: password
+      # -- The key in which Postgres will look for, for the replication password, in the existing Secret
+      replicationPasswordKey: replication-password
+  
+
+

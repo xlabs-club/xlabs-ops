@@ -1,42 +1,33 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as kubernetes from "@pulumi/kubernetes";
+import * as ejs from "ejs";
 
 let config = new pulumi.Config();
 
 // Deploy keycloak using the Helm chart
+
+const valueYamlAsset = pulumi.all(
+    [
+        config.requireSecret("keycloakAdminPassword"),
+        config.requireSecret("globalPostgresPassword")
+    ])
+    .apply(([adminPwd, postgrePwd]) => {
+        const replaceVars = {
+            hostname: "iam." + config.require("hostnameSuffix"),
+            adminPassword: adminPwd,
+            postgresPassword: postgrePwd
+        }
+        return new pulumi.asset.StringAsset(ejs.renderFile("./keycloak.values.yaml", replaceVars));
+    });
+
 const keycloakRelease = new kubernetes.helm.v3.Release("keycloak", {
     name: "keycloak",
     chart: "oci://registry-1.docker.io/bitnamicharts/keycloak",
-    version: "21.8.0",
+    version: "22.2.6",
     namespace: "keycloak",
     createNamespace: true,
     timeout: 600,
-    values: {
-        auth: {
-            adminUser: "admin",
-            adminPassword: config.requireSecret("keycloakAdminPassword")
-        },
-        ingress: {
-            enabled: true,
-            tls: true,
-            hostname: "keycloak." + config.require("hostnameSuffix"),
-            annotations: {
-                "cert-manager.io/cluster-issuer": config.require("clusterIssuer")
-            },
-        },
-        production: true,
-        proxy: "edge",
-        postgresql: {
-            enabled: true,
-            auth: {
-                postgresPassword: config.requireSecret("globalPostgresPassword"),
-                username: "keycloak",
-                password: config.requireSecret("globalPostgresPassword"),
-                database: "keycloak"
-            }
-        }
-    },
-    
+    valueYamlFiles: [valueYamlAsset]
 });
 
 

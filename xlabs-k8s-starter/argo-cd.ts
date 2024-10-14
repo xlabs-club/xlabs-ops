@@ -7,10 +7,10 @@ let config = new pulumi.Config();
 const helmRelease = new kubernetes.helm.v3.Release("argo-cd", {
     name: "argo-cd",
     chart: "oci://registry-1.docker.io/bitnamicharts/argo-cd",
-    version: "6.6.9",
+    version: "7.0.14",
     namespace: "argo-cd",
     createNamespace: true,
-    timeout: 600,
+    timeout: 300,
     // valueYamlFiles: [new FileAsset("./values.yml")],
     values: {
         ingress: {

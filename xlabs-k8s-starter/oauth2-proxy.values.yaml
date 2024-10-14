@@ -1,0 +1,48 @@
+ingress:
+  enabled: true
+  className: traefik
+  hostname: <%= hostname %>
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+  tls: true
+  certManager: true
+
+# change default port
+service:
+  port: 4180
+
+## Configuration section
+##
+configuration:
+  clientID: <%= clientID %>
+  clientSecret: <%= clientSecret %>
+  # openssl rand -base64 32 | tr -- '+/' '-_'
+  cookieSecret: "FAvEZfNGYgEi-V4v5FWT6V7rCghcSgqF0jjNwYHU2w8="
+  ## oauth2_proxy.cfg
+    # set_xauthrequest = true
+    #  - --set-authorization-header=true
+    #   - --set-xauthrequest=true
+    # - --reverse-proxy=true
+  content: |
+    reverse_proxy = true
+    provider = "keycloak-oidc"
+    provider_display_name = "Keycloak"
+    email_domains = "*" 
+    ssl_insecure_skip_verify = true
+    ssl_upstream_insecure_skip_verify = true
+    insecure_oidc_allow_unverified_email = true
+    code_challenge_method = "S256"
+    upstreams = "file:///dev/null"
+
+  oidcIssuerUrl: <%= keycloakBaseUrl %>/realms/devops
+  redirectUrl: ""
+  ## @param configuration.whiteList Allowed domains for redirection after authentication. Prefix domain with a . or a *. to allow subdomains
+  whiteList: "*"
+# ## @param extraArgs add extra args to the default command
+# ##
+# extraArgs: []
+
+redis:
+  enabled: false
+#   architecture: "standalone"
