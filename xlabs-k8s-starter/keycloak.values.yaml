@@ -1,9 +1,10 @@
 auth:
-  adminUser: "admin"
+  adminUser: <%= adminUser %>
   adminPassword: <%= adminPassword %>
 
 ingress:
   enabled: true
+  ingressClassName: traefik
   tls: true
   hostname: <%= hostname %>
   annotations:
@@ -11,6 +12,7 @@ ingress:
 
 production: true
 proxy: "edge"
+resourcesPreset: "medium"
 
 networkPolicy:
   enabled: false
@@ -21,3 +23,12 @@ postgresql:
     username: "keycloak"
     password: <%= postgresPassword %>
     database: "keycloak"
+
+keycloakConfigCli:
+  enabled: true
+  configuration:
+    devops.yaml: |
+      realm: devops
+      enabled: true
+  cleanupAfterFinished:
+    enabled: true

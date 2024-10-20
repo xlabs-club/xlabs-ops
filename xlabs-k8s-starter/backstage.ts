@@ -29,7 +29,7 @@ const valueYamlAsset = pulumi.all(
 const backstageRelease = new kubernetes.helm.v3.Release("backstage", {
     name: "backstage",
     chart: "oci://ghcr.io/backstage/charts/backstage",
-    version: "1.9.6",
+    version: "1.11.0",
     namespace: "backstage",
     createNamespace: true,
     timeout: 300,

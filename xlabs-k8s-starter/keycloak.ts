@@ -8,12 +8,14 @@ let config = new pulumi.Config();
 
 const valueYamlAsset = pulumi.all(
     [
+        config.requireSecret("keycloakAdminUser"),
         config.requireSecret("keycloakAdminPassword"),
         config.requireSecret("globalPostgresPassword")
     ])
-    .apply(([adminPwd, postgrePwd]) => {
+    .apply(([adminUser, adminPwd, postgrePwd]) => {
         const replaceVars = {
             hostname: "iam." + config.require("hostnameSuffix"),
+            adminUser: adminUser,
             adminPassword: adminPwd,
             postgresPassword: postgrePwd
         }
@@ -22,10 +24,13 @@ const valueYamlAsset = pulumi.all(
 
 const keycloakRelease = new kubernetes.helm.v3.Release("keycloak", {
     name: "keycloak",
-    chart: "oci://registry-1.docker.io/bitnamicharts/keycloak",
-    version: "22.2.6",
+    chart: "keycloak",
+    version: "24.0.1",
     namespace: "keycloak",
     createNamespace: true,
+    repositoryOpts: {
+        repo: "https://charts.bitnami.com/bitnami",
+    },
     timeout: 600,
     valueYamlFiles: [valueYamlAsset]
 });

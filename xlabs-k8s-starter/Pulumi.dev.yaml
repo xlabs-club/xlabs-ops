@@ -35,10 +35,12 @@ config:
     secure: v1:8G/T636xQanJe45V:67xN6/IZgKsSsbwL/Rfy7UH+TGZbd5wV
   xlabs-k8s-starter:hostnameSuffix: nxest.com
   xlabs-k8s-starter:keycloakAdminPassword:
-    secure: v1:qjOZdZEC6iwGK7nc:43vWzK2PriWbDk5Rfx1sH2V135a2hSApNBpY
+    secure: v1:VRRF7lnK4TGpHTA0:G9KeMJxaXoy3Fwkh6L+yMuzqs+HAgM6htMOo0A==
   xlabs-k8s-starter:keycloakPostgresqlPassword:
     secure: v1:+zZ/9uxpUZNOiuaw:KVe8QgIHpWddBHAeR8t3YfpyGRk7t5FUo0FQ
   xlabs-k8s-starter:oauthClientID:
     secure: v1:ZMTgx1+DYgpPw6OC:7W0u84SF54uNfiynTE+WnhrVflsNBvIL/3YzEw==
   xlabs-k8s-starter:oauthClientSecret:
-    secure: v1:A4os5dJ1JBPCfwfl:tWsZ2bjgQfeYlDG60j2rstf6N8uu4jHZPgFbva6psdeG4POJgNgNgSLeX74TYTCB
+    secure: v1:AC50RUDjt9L19Vn7:p/XVknSK3EZBWwaT1B4B3TNx0LbVxKLQIsZtCV04HU7+1tQNY+JUGSmzl/WxH94v
+  xlabs-k8s-starter:keycloakAdminUser:
+    secure: v1:pbwNDGVxytrGuyMK:YvPsoocK74hq7kW2x8iDgwoES0QP

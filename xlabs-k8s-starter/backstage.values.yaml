@@ -7,7 +7,9 @@ ingress:
     secretName: <%= hostname %>-tls
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-issuer
-    traefik.ingress.kubernetes.io/router.middlewares: oauth-errors,oauth2-proxy
+    # middlewares 格式为 namespace-middleware@@kubernetescrd，要加 namespace 前缀，如果是 default namespace 也要加 default- 前缀
+    traefik.ingress.kubernetes.io/router.middlewares: oauth2-proxy-errors-sign-in@kubernetescrd,oauth2-proxy-forward-auth@kubernetescrd
+    # traefik.ingress.kubernetes.io/router.tls: "true"
     # traefik.ingress.kubernetes.io/router.priority: "10"
 
 backstage:
@@ -15,10 +17,11 @@ backstage:
     registry: docker.io
     repository: nxest/xlabs-developer-platform
     tag: dev
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
+    # pullPolicy: Always
 
   extraEnvVars:
-    # Node.js 忽略https证书校验
+    # Node.js 忽略 https 证书校验
     - name: NODE_TLS_REJECT_UNAUTHORIZED
       value: "0"
 
