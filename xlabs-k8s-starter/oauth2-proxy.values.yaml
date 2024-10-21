@@ -29,6 +29,7 @@ configuration:
     ssl_upstream_insecure_skip_verify = true
     insecure_oidc_allow_unverified_email = true
     code_challenge_method = "S256"
+    cookie_expire = "12h"
     upstreams = "file:///dev/null"
 
   oidcIssuerUrl: <%= keycloakBaseUrl %>/realms/devops
