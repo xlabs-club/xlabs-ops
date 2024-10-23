@@ -11,7 +11,9 @@ ingress:
     cert-manager.io/cluster-issuer: selfsigned-issuer
 
 production: true
-proxy: "edge"
+# https://www.keycloak.org/server/reverseproxy
+proxyHeaders: "xforwarded"
+# proxy: "edge"
 resourcesPreset: "medium"
 
 networkPolicy:
