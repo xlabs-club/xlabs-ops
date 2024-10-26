@@ -1,13 +1,3 @@
-ingress:
-  enabled: false
-  className: traefik
-  hostname: <%= hostname %>
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: selfsigned-issuer
-  tls: true
-  certManager: true
-
 # change default port
 service:
   port: 4180
@@ -19,27 +9,52 @@ configuration:
   clientSecret: <%= clientSecret %>
   # openssl rand -base64 32 | tr -- '+/' '-_'
   cookieSecret: "FAvEZfNGYgEi-V4v5FWT6V7rCghcSgqF0jjNwYHU2w8="
-  ## oauth2_proxy.cfg，注意等号后面 String类型需要引号
+  # https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
+  # oauth2_proxy.cfg，注意等号后面 String类型需要引号
   content: |
     reverse_proxy = true
     provider = "keycloak-oidc"
     provider_display_name = "Keycloak"
     email_domains = "*" 
+    set_xauthrequest = true
+    set_authorization_header = true
     ssl_insecure_skip_verify = true
     ssl_upstream_insecure_skip_verify = true
     insecure_oidc_allow_unverified_email = true
     code_challenge_method = "S256"
     cookie_expire = "12h"
     upstreams = "file:///dev/null"
+    silence_ping_logging = true
 
   oidcIssuerUrl: <%= keycloakBaseUrl %>/realms/devops
   redirectUrl: ""
-  ## @param configuration.whiteList Allowed domains for redirection after authentication. Prefix domain with a . or a *. to allow subdomains
-  whiteList: "*"
+  # 白名单： *.xxx.com
+  whiteList: "<%= whiteList %>"
+
+extraEnvVars:
+  - name: OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR
+    value: /bitnami/oauth2-proxy/templates
+
+extraVolumes: 
+  - emptyDir: {}
+    name: templates
+
+extraVolumeMounts: 
+  - mountPath: /bitnami/oauth2-proxy/templates
+    name: templates
+
+initContainers:
+  # copy 自定义模板，不需要点击 `Sign in` 按钮，自动重定向到登录页
+  - name: auto-sign-in
+    # 源码： https://github.com/l10178/x-container
+    image: docker.io/nxest/oauth2-proxy-auto-sign-in:v7.7.1
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR
+      value: /bitnami/oauth2-proxy/templates
+    volumeMounts:
+      - mountPath: /bitnami/oauth2-proxy/templates
+        name: templates
 
 redis:
   enabled: false
-#   architecture: "standalone"
-
-# approval_prompt = "auto"
-# skip_provider_button = true

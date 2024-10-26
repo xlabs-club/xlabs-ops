@@ -48,9 +48,7 @@ spec:
       name: oauth2-proxy
       namespace: oauth2-proxy
       port: http
-      # port: 4180
     query: "/oauth2/sign_in"
-    # query: "/oauth2/start?rd=%2F"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
@@ -63,5 +61,9 @@ spec:
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-Request-User
+      - X-Auth-Request-Groups
+      - X-Auth-Request-Roles
       - X-Auth-Request-Preferred-Username
+      # - X-Auth-Request-Access-Token
+      - Authorization
       - Set-Cookie

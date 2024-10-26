@@ -15,6 +15,7 @@ const valueYamlAsset = pulumi.all(
         const replaceVars = {
             keycloakBaseUrl: "https://" + "iam." + config.require("hostnameSuffix"),
             hostname: "opy." + config.require("hostnameSuffix"),
+            whiteList: "*." + config.require("hostnameSuffix"),
             clientID: clientID,
             clientSecret: clientSecret
         }
