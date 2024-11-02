@@ -25,7 +25,7 @@ const valueYamlAsset = pulumi.all(
 const keycloakRelease = new kubernetes.helm.v3.Release("keycloak", {
     name: "keycloak",
     chart: "keycloak",
-    version: "24.0.2",
+    version: "24.0.4",
     namespace: "keycloak",
     createNamespace: true,
     repositoryOpts: {
