@@ -27,7 +27,7 @@ postgresql:
     database: "keycloak"
 
 keycloakConfigCli:
-  enabled: true
+  enabled: false
   configuration:
     devops.yaml: |
       realm: devops

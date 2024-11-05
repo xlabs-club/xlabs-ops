@@ -64,6 +64,6 @@ spec:
       - X-Auth-Request-Groups
       - X-Auth-Request-Roles
       - X-Auth-Request-Preferred-Username
-      # - X-Auth-Request-Access-Token
+      - X-Auth-Request-Access-Token
       - Authorization
       - Set-Cookie
