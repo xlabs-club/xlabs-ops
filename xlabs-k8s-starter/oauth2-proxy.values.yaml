@@ -64,4 +64,8 @@ initContainers:
         name: templates
 
 redis:
-  enabled: false
+  enabled: true
+  global:
+    # imageRegistry: ""
+    redis:
+      password: "A4v5FWT6V7rCghcSgqF0jjNwYHU29"
