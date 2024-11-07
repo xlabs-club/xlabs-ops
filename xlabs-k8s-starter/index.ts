@@ -6,3 +6,4 @@ import "./backstage";
 // import "./argo-workflows";
 // import "./argo-cd";
 import "./coredns-custom";
+import "./cdn";
