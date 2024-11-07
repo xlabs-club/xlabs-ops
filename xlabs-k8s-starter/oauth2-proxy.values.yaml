@@ -2,6 +2,8 @@
 service:
   port: 4180
 
+resourcesPreset: "small"
+
 ## Configuration section
 ##
 configuration:
@@ -34,6 +36,7 @@ configuration:
   # 白名单： *.xxx.com
   whiteList: "<%= whiteList %>"
 
+    # cookie_domains = "<%= whiteList %>"
 # Recommended settings:
 # cookie_refresh := Access-Token lifespan - 1m
 # cookie_expire := Refresh-Token lifespan (i.e. Keycloak client_session_idle)
