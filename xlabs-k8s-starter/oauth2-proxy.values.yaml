@@ -27,6 +27,9 @@ configuration:
     code_challenge_method = "S256"
     cookie_expire = "30m"
     cookie_refresh = "4m"
+    cookie_csrf_expire = "5m"
+    cookie_csrf_per_request = true
+    cookie_samesite = "lax"
     upstreams = "file:///dev/null"
     silence_ping_logging = true
     backend_logout_url = "<%= keycloakBaseUrl %>/realms/devops/protocol/openid-connect/logout"
@@ -72,3 +75,6 @@ redis:
     # imageRegistry: ""
     redis:
       password: "A4v5FWT6V7rCghcSgqF0jjNwYHU29"
+  master:
+    persistence:
+      enabled: false

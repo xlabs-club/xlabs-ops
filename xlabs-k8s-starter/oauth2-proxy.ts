@@ -27,7 +27,7 @@ const valueYamlAsset = pulumi.all(
 const oauth2ProxyRelease = new kubernetes.helm.v3.Release("oauth2-proxy", {
     name: "oauth2-proxy",
     chart: "oauth2-proxy",
-    version: "6.0.5",
+    version: "6.0.6",
     namespace: "oauth2-proxy",
     createNamespace: true,
     repositoryOpts: {
