@@ -1,7 +1,14 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as kubernetes from "@pulumi/kubernetes";
+import * as ejs from "ejs";
 
 let config = new pulumi.Config();
+
+const replaceVars = {
+    hostname: "cdn." + config.require("hostnameSuffix"),
+}
+const rendered = ejs.renderFile("./cdn.values.yaml", replaceVars);
+const valueYamlAsset= new pulumi.asset.StringAsset(rendered);
 
 const cdnRelease = new kubernetes.helm.v3.Release("cdn", {
     name: "cdn",
@@ -10,27 +17,7 @@ const cdnRelease = new kubernetes.helm.v3.Release("cdn", {
     namespace: "cdn",
     createNamespace: true,
     timeout: 300,
-    values: {
-        image: {
-            repository: "nxest/hamster",
-            tag: "0.0.1"
-        },
-        resourcesPreset: "small",
-        tls: {
-            enabled: false,
-        },
-        service: {
-            type: "ClusterIP",
-        },
-        ingress: {
-            enabled: true,
-            tls: true,
-            hostname: "cdn." + config.require("hostnameSuffix"),
-            annotations: {
-                "cert-manager.io/cluster-issuer": config.require("clusterIssuer")
-            },
-        },
-    },
+    valueYamlFiles: [valueYamlAsset]
 });
 
 export const cdnReleaseStatus = cdnRelease.status;
