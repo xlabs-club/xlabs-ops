@@ -44,3 +44,7 @@ config:
     secure: v1:AC50RUDjt9L19Vn7:p/XVknSK3EZBWwaT1B4B3TNx0LbVxKLQIsZtCV04HU7+1tQNY+JUGSmzl/WxH94v
   xlabs-k8s-starter:keycloakAdminUser:
     secure: v1:pbwNDGVxytrGuyMK:YvPsoocK74hq7kW2x8iDgwoES0QP
+  xlabs-k8s-starter:backstageClientId:
+    secure: v1:FOIIk9Q0FKSZtAiP:DNWmikGZiy/5N4rTSzHDWF3IIA==
+  xlabs-k8s-starter:backstageClientSecret:
+    secure: v1:u04QlgTfzDw4Xs3R:06yBrjX9M27TWGaT07CYAdVeuzKs2uR6S13i7j7J2NVsdQQKX3Zqrgxth6dB6HLH

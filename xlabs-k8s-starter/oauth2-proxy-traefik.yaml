@@ -43,7 +43,8 @@ metadata:
 spec:
   errors:
     status:
-      - "401-403"
+      - "401"
+      # - "403"
     service:
       name: oauth2-proxy
       namespace: oauth2-proxy
@@ -62,8 +63,7 @@ spec:
     authResponseHeaders:
       - X-Auth-Request-User
       - X-Auth-Request-Groups
-      - X-Auth-Request-Roles
       - X-Auth-Request-Preferred-Username
       - X-Auth-Request-Access-Token
-      - Authorization
+      # - Authorization
       - Set-Cookie
