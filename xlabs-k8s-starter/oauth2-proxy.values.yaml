@@ -30,6 +30,7 @@ configuration:
     cookie_csrf_expire = "5m"
     cookie_csrf_per_request = true
     cookie_samesite = "lax"
+    skip_auth_routes = '.*\.(js|css)$'
     upstreams = "file:///dev/null"
     silence_ping_logging = true
     backend_logout_url = "<%= keycloakBaseUrl %>/realms/devops/protocol/openid-connect/logout"
@@ -39,7 +40,8 @@ configuration:
   # 白名单： *.xxx.com
   whiteList: "<%= whiteList %>"
 
-    # cookie_domains = "<%= whiteList %>"
+
+# cookie_domains = "<%= whiteList %>"
 # Recommended settings:
 # cookie_refresh := Access-Token lifespan - 1m
 # cookie_expire := Refresh-Token lifespan (i.e. Keycloak client_session_idle)
