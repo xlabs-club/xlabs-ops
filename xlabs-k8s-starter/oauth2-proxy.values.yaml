@@ -60,7 +60,7 @@ initContainers:
   # copy 自定义模板，不需要点击 `Sign in` 按钮，自动重定向到登录页
   - name: auto-sign-in
     # 源码： https://github.com/l10178/x-container
-    image: docker.io/nxest/oauth2-proxy-auto-sign-in:v7.7.1
+    image: docker.io/nxest/oauth2-proxy-auto-sign-in:v7.7.2
     imagePullPolicy: IfNotPresent
     env:
     - name: OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR
