@@ -1,39 +1,6 @@
-# 需要开启 traefik allowCrossNamespace
+# 需要开启 traefik allowCrossNamespace以便支持Ingress跨namespace使用 middleware
 #  kubectl -n kube-system edit deployments.apps traefik  
 #  --providers.kubernetescrd.allowCrossNamespace=true
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: selfsigned-issuer
-    # https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/
-    # middlewares 格式为 namespace-middleware@@kubernetescrd，要加 namespace 前缀，如果是 default namespace 也要加 default- 前缀
-    traefik.ingress.kubernetes.io/router.middlewares: oauth2-proxy-errors-sign-in@kubernetescrd
-    # traefik.ingress.kubernetes.io/router.tls: "true"
-    # https://doc.traefik.io/traefik/routing/routers/#priority
-    # traefik.ingress.kubernetes.io/router.priority: "42"
-  name: oauth-errors-sign-in
-  namespace: oauth2-proxy
-spec:
-  ingressClassName: traefik
-  rules:
-  # 这里host我会用pulumi替换掉，只支持一个host
-  - host: "*.nxest.com"
-    http:
-      paths:
-      - backend:
-          service:
-            name: oauth2-proxy
-            port:
-              name: http
-        path: /oauth2
-        pathType: Prefix
-  tls:
-  - hosts:
-    - "*.nxest.com"
-    secretName: "widles-placeholder-tls"
-
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
@@ -44,6 +11,7 @@ spec:
   errors:
     status:
       - "401"
+      # 我们有业务自定义403处理逻辑，所以此处不拦截403请求
       # - "403"
     service:
       name: oauth2-proxy
@@ -65,5 +33,53 @@ spec:
       - X-Auth-Request-Groups
       - X-Auth-Request-Preferred-Username
       - X-Auth-Request-Access-Token
+      # oauth2-proxy 的 Authorization 是 ID Token，不是 Access Token
       # - Authorization
       - Set-Cookie
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-headers
+  namespace: oauth2-proxy
+spec:
+  headers:
+    sslRedirect: true
+    # sslHost: xxx.cn
+    stsSeconds: 315360000
+    browserXssFilter: true
+    contentTypeNosniff: true
+    forceSTSHeader: true
+    stsIncludeSubdomains: true
+    stsPreload: true
+    frameDeny: true
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+    # https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/
+    # middlewares 格式为 namespace-middleware@@kubernetescrd，要加 namespace 前缀，如果是 default namespace 也要加 default- 前缀
+    traefik.ingress.kubernetes.io/router.middlewares: oauth2-proxy-oauth2-headers@kubernetescrd
+  name: oauth-errors-sign-in
+  namespace: oauth2-proxy
+spec:
+  ingressClassName: traefik
+  rules:
+  # 这里host我会用pulumi替换掉，只支持一个host
+  - host: "*.nxest.com"
+    http:
+      paths:
+      - backend:
+          service:
+            name: oauth2-proxy
+            port:
+              name: http
+        path: /oauth2
+        pathType: Prefix
+  tls:
+  - hosts:
+    - "*.nxest.com"
+    secretName: "widles-placeholder-tls"
