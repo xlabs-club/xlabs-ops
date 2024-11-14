@@ -13,6 +13,9 @@ configuration:
   cookieSecret: "FAvEZfNGYgEi-V4v5FWT6V7rCghcSgqF0jjNwYHU2w8="
   # https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
   # oauth2_proxy.cfg，注意等号后面 String类型需要引号
+  # Recommended settings:
+  #   cookie_refresh := Access-Token lifespan - 1m
+  #   cookie_expire := Refresh-Token lifespan (i.e. Keycloak client_session_idle)
   content: |
     reverse_proxy = true
     provider = "keycloak-oidc"
@@ -39,12 +42,6 @@ configuration:
   redirectUrl: ""
   # 白名单： *.xxx.com
   whiteList: "<%= whiteList %>"
-
-
-# cookie_domains = "<%= whiteList %>"
-# Recommended settings:
-# cookie_refresh := Access-Token lifespan - 1m
-# cookie_expire := Refresh-Token lifespan (i.e. Keycloak client_session_idle)
 
 extraEnvVars:
   - name: OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR
