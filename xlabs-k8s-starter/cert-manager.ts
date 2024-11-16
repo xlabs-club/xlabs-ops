@@ -12,6 +12,7 @@ const certManagerRelease = new kubernetes.helm.v3.Release("cert-manager", {
     namespace: "cert-manager",
     createNamespace: true,
     timeout: 300,
+    maxHistory: 10,
     repositoryOpts: {
         repo: "https://charts.jetstack.io",
     },

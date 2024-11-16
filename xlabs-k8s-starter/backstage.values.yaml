@@ -1,20 +1,12 @@
+# 由oauth2-proxy对外暴露ingress
 ingress:
-  enabled: true
-  className: traefik
-  host: <%= hostname %>
-  tls:
-    enabled: true
-    secretName: <%= hostname %>-tls
-  annotations:
-    cert-manager.io/cluster-issuer: selfsigned-issuer
-    # middlewares 格式为 namespace-middleware@@kubernetescrd，要加 namespace 前缀，如果是 default namespace 也要加 default- 前缀
-    traefik.ingress.kubernetes.io/router.middlewares: oauth2-proxy-errors-sign-in@kubernetescrd,oauth2-proxy-forward-auth@kubernetescrd
+  enabled: false
 
 backstage:
   image:
     registry: docker.io
     repository: nxest/xlabs-developer-platform
-    tag: dev-alpha-1
+    tag: dev-alpha-2
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
@@ -102,9 +94,9 @@ backstage:
         oauth2Proxy:
           signIn:
             resolvers:
-              - resolver: forwardedUserMatchingUserEntityName
               - resolver: emailMatchingUserEntityProfileEmail
-              - resolver: emailLocalPartMatchingUserEntityName
+              # - resolver: emailLocalPartMatchingUserEntityName
+              # - resolver: forwardedUserMatchingUserEntityName
     catalog:
       providers:
         # gitlab:

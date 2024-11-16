@@ -32,6 +32,7 @@ const keycloakRelease = new kubernetes.helm.v3.Release("keycloak", {
         repo: "https://charts.bitnami.com/bitnami",
     },
     timeout: 600,
+    maxHistory: 10,
     valueYamlFiles: [valueYamlAsset]
 });
 

@@ -11,6 +11,7 @@ const helmRelease = new kubernetes.helm.v3.Release("argo-cd", {
     namespace: "argo-cd",
     createNamespace: true,
     timeout: 300,
+    maxHistory: 10,
     // valueYamlFiles: [new FileAsset("./values.yml")],
     values: {
         ingress: {

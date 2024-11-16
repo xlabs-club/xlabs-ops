@@ -34,28 +34,29 @@ const oauth2ProxyRelease = new kubernetes.helm.v3.Release("oauth2-proxy", {
         repo: "https://charts.bitnami.com/bitnami",
     },
     timeout: 120,
+    maxHistory: 10,
     valueYamlFiles: [valueYamlAsset]
 });
 
-// 修改 ingress host 后缀
-const transformIngressHost = (obj: any, opts: pulumi.CustomResourceOptions) => {
-    if (obj.kind === "Ingress") {
-        obj.spec.rules.forEach((rule: any) => {
-            rule.host = "*." + config.require("hostnameSuffix");
-        });
-        obj.spec.tls.forEach((rule: any) => {
-            rule.host = "*." + config.require("hostnameSuffix");
-        });
-    }
-};
+// // 修改 ingress host 后缀
+// const transformIngressHost = (obj: any, opts: pulumi.CustomResourceOptions) => {
+//     if (obj.kind === "Ingress") {
+//         obj.spec.rules.forEach((rule: any) => {
+//             rule.host = "*." + config.require("hostnameSuffix");
+//         });
+//         obj.spec.tls.forEach((rule: any) => {
+//             rule.host = "*." + config.require("hostnameSuffix");
+//         });
+//     }
+// };
 
-// 根据yaml文件创建 traefik Middleware
-const traefikConfig = new kubernetes.yaml.ConfigFile("oauth2-proxy-traefik", {
-    file: "./oauth2-proxy-traefik.yaml",
-    transformations: [transformIngressHost],
-});
+// // 根据yaml文件创建 traefik Middleware
+// const traefikConfig = new kubernetes.yaml.ConfigFile("oauth2-proxy-traefik", {
+//     file: "./oauth2-proxy-traefik.yaml",
+//     transformations: [transformIngressHost],
+// });
 
 export const oauth2ProxyReleaseStatus = oauth2ProxyRelease.status;
 // Export the name of the Ingress
-export const ingressName = traefikConfig.getResource("networking.k8s.io/v1/Ingress", "oauth2-proxy", "oauth-errors-sign-in").metadata.name;
+// export const ingressName = traefikConfig.getResource("networking.k8s.io/v1/Ingress", "oauth2-proxy", "oauth-errors-sign-in").metadata.name;
 

@@ -11,6 +11,7 @@ const argoRelease = new kubernetes.helm.v3.Release("argo-workflows", {
     namespace: "argo-workflows",
     createNamespace: true,
     timeout: 300,
+    maxHistory: 10,
     values: {
         ingress: {
             enabled: true,

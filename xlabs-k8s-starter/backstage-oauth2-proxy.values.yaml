@@ -1,0 +1,78 @@
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hostname: <%= hostname %>
+  tls: true
+  certManager: true
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+
+resourcesPreset: "small"
+
+## Configuration section
+##
+configuration:
+  clientID: <%= clientID %>
+  clientSecret: <%= clientSecret %>
+  # openssl rand -base64 32 | tr -- '+/' '-_'
+  cookieSecret: "QLsmTC3EBPFa1fnaZyVcT8uHO8MjZE5h8cgc5VUeVTE="
+  # https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
+  # oauth2_proxy.cfg，注意等号后面 String类型需要引号
+  # Recommended settings:
+  #   cookie_refresh := Access-Token lifespan - 1m
+  #   cookie_expire := Refresh-Token lifespan (i.e. Keycloak client_session_idle)
+  content: |
+    provider = "keycloak-oidc"
+    provider_display_name = "Keycloak"
+    email_domains = "*" 
+    pass_access_token = true
+    ssl_insecure_skip_verify = true
+    ssl_upstream_insecure_skip_verify = true
+    insecure_oidc_allow_unverified_email = true
+    code_challenge_method = "S256"
+    cookie_expire = "30m"
+    cookie_refresh = "4m"
+    skip_auth_routes = '.*\.(js|css)$'
+    upstreams = "http://backstage.backstage.svc:7007"
+    silence_ping_logging = true
+    backend_logout_url = "<%= keycloakBaseUrl %>/realms/devops/protocol/openid-connect/logout"
+
+  oidcIssuerUrl: <%= keycloakBaseUrl %>/realms/devops
+  redirectUrl: ""
+  # 白名单： *.xxx.com
+  whiteList: "<%= whiteList %>"
+
+extraEnvVars:
+  - name: OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR
+    value: /bitnami/oauth2-proxy/templates
+
+extraVolumes:
+  - emptyDir: {}
+    name: templates
+
+extraVolumeMounts: 
+  - mountPath: /bitnami/oauth2-proxy/templates
+    name: templates
+
+initContainers:
+  # copy 自定义模板，不需要点击 `Sign in` 按钮，自动重定向到登录页
+  - name: auto-sign-in
+    # 源码： https://github.com/l10178/x-container
+    image: docker.io/nxest/oauth2-proxy-auto-sign-in:v7.7.2
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR
+      value: /bitnami/oauth2-proxy/templates
+    volumeMounts:
+      - mountPath: /bitnami/oauth2-proxy/templates
+        name: templates
+
+redis:
+  enabled: false
+  # global:
+  #   # imageRegistry: ""
+  #   redis:
+  #     password: "A4v5FWT6V7rCghcSgqF0jjNwYHU29"
+  # master:
+  #   persistence:
+  #     enabled: false
