@@ -6,7 +6,7 @@ backstage:
   image:
     registry: docker.io
     repository: nxest/xlabs-developer-platform
-    tag: dev-alpha-2
+    tag: dev-alpha-4
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
@@ -62,22 +62,27 @@ backstage:
     #           skipMetricsLookup: true
 
     permission:
-      enabled: false
+      enabled: true
+      # see https://github.com/backstage/community-plugins/tree/main/workspaces/rbac/plugins/rbac-backend
+      rbac:
+        maxDepth: 1
+        admin:
+          superUsers:
+            # - name: user:default/alice
+            - name: group:default/admin
+          users:
+            # - name: user:default/alice
+            - name: group:default/admin
+        pluginsWithPermission:
+          - kubernetes
+          - catalog
       auth:
         dangerouslyDisableDefaultAuthPolicy: true
         # 这种配置方式已过时，切换到新的pluginKeyStore/externalAccess?
         keys:
           # node -p 'require("crypto").randomBytes(24).toString("base64")'
           - secret: 8Dv1Q7xdGcUbG+nuBL9RwGRd6dSesaTA
-      # rbac:
-      #   pluginsWithPermission:
-      #     - catalog
-      #   admin:
-      #     superUsers:
-      #       - name: group:default/admin
-      #     users:
-      #       # - name: user:default/x-man
-      #       - name: group:default/admin
+
     # proxy:
     #   endpoints:
     #     '/xxx':
@@ -87,10 +92,7 @@ backstage:
 
     auth:
       environment: production
-      # session:
-      #   secret: a-secret-for-sessions
       providers:
-        guest: {}
         oauth2Proxy:
           signIn:
             resolvers:
