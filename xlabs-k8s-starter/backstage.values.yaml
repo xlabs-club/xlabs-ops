@@ -6,7 +6,7 @@ backstage:
   image:
     registry: docker.io
     repository: nxest/xlabs-developer-platform
-    tag: dev-alpha-4
+    tag: dev-alpha-6
     pullPolicy: IfNotPresent
     # pullPolicy: Always
 
