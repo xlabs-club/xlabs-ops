@@ -26,7 +26,7 @@ const keycloakRelease = new kubernetes.helm.v3.Release("keycloak", {
     name: "keycloak",
     // chart: "keycloak",
     chart: "oci://registry-1.docker.io/bitnamicharts/keycloak",
-    version: "24.2.2",
+    version: "24.2.3",
     namespace: "keycloak",
     createNamespace: true,
     // repositoryOpts: {

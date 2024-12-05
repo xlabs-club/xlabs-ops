@@ -26,13 +26,14 @@ const valueYamlAsset = pulumi.all(
 // Deploy oauth2-proxy using the Helm chart
 const oauth2ProxyRelease = new kubernetes.helm.v3.Release("oauth2-proxy", {
     name: "oauth2-proxy",
-    chart: "oauth2-proxy",
-    version: "6.0.6",
+    // chart: "oauth2-proxy",
+    chart: "oci://registry-1.docker.io/bitnamicharts/oauth2-proxy",
+    version: "6.1.1",
     namespace: "oauth2-proxy",
     createNamespace: true,
-    repositoryOpts: {
-        repo: "https://charts.bitnami.com/bitnami",
-    },
+    // repositoryOpts: {
+    //     repo: "https://charts.bitnami.com/bitnami",
+    // },
     timeout: 120,
     maxHistory: 10,
     valueYamlFiles: [valueYamlAsset]

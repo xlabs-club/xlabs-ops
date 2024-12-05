@@ -1,0 +1,62 @@
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  tls: true
+  hostname: <%= hostname %>
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+
+server:
+  resourcesPreset: "medium"
+  auth:
+    enabled: true
+    # Set authentication mode. Either `server`, `client` or `sso`.
+    # mode: client
+    mode: sso
+    sso:
+      enabled: true
+      # See https://argo-workflows.readthedocs.io/en/stable/workflow-controller-configmap.yaml
+      config:
+        issuer: <%= keycloakBaseUrl %>/realms/devops
+        sessionExpiry: 10h
+        clientId:
+          name: "argo-workflows-sso"
+          key: "clientId"
+        clientSecret:
+          name: "argo-workflows-sso"
+          key: "clientSecret"
+        ## The OIDC redirect URL. Should be in the form <argo-root-url>/oauth2/callback.
+        redirectUrl: https://<%= hostname %>/oauth2/callback
+        # Additional scopes to request. Typically needed for SSO RBAC. >= v2.12
+        scopes:
+          # groups不是标准的规范，需要你的OIDC服务端支持
+          - groups
+          - email
+          - profile
+        # Skip TLS verify
+        insecureSkipVerify: true
+      rbac:
+        enabled: false
+        secretWhitelist: []
+
+controller:
+  service:
+    # for ingress tls
+    annotations:
+      cert-manager.io/cluster-issuer: selfsigned-issuer
+  # Number of workflow workers to deploy
+  workflowWorkers: 8
+  ## Namespaces allowed to run workflows
+  workflowNamespaces:
+    - default
+    - argo
+
+networkPolicy:
+  enabled: false
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: <%= postgresPassword %>
+    username: "argo_workflows"
+    password: <%= postgresPassword %>
+    database: "argo_workflows"

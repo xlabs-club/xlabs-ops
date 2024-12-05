@@ -3,7 +3,7 @@ export * from "./cert-manager";
 import "./keycloak";
 import "./oauth2-proxy";
 import "./backstage";
-// import "./argo-workflows";
+import "./argo-workflows";
 // import "./argo-cd";
 import "./coredns-custom";
 import "./cdn";

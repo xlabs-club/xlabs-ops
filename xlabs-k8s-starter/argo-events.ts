@@ -26,21 +26,23 @@ const valueYamlAsset = pulumi.all(
             keycloakBaseUrl: "https://" + "iam." + config.require("hostnameSuffix"),
             postgresPassword: postgrePwd
         }
-        return new pulumi.asset.StringAsset(ejs.renderFile("./argo-workflows.values.yaml", replaceVars));
+        return new pulumi.asset.StringAsset(ejs.renderFile("./argo-events.values.yaml", replaceVars));
     });
 
-// Deploy argo-workflows using the Helm chart
-const argoRelease = new kubernetes.helm.v3.Release("argo-workflows", {
-    name: "argo-workflows",
-    chart: "oci://registry-1.docker.io/bitnamicharts/argo-workflows",
-    version: "11.0.3",
+const argoEventsRelease = new kubernetes.helm.v3.Release("argo-events", {
+    name: "argo-events",
+    chart: "argo-events",
+    version: "2.4.9",
     namespace: "argo",
     createNamespace: true,
     timeout: 300,
     maxHistory: 10,
+    repositoryOpts: {
+        repo: "https://argoproj.github.io/argo-helm",
+    },
     valueYamlFiles: [valueYamlAsset]
 });
 
 export const ssoSecretName = ssoSecret.metadata.name;
-export const argoWorkflowsReleaseStatus = argoRelease.status;
+export const argoEventsReleaseStatus = argoEventsRelease.status;
 

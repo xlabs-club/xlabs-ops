@@ -63,13 +63,13 @@ const oauht2BackstageValueYamlAsset = pulumi.all(
 // Deploy oauth2-proxy using the Helm chart
 const oauth2ProxyBackstageRelease = new kubernetes.helm.v3.Release("backstage-oauth2-proxy", {
     name: "backstage-oauth2-proxy",
-    chart: "oauth2-proxy",
-    version: "6.0.6",
+    chart: "oci://registry-1.docker.io/bitnamicharts/oauth2-proxy",
+    version: "6.1.1",
     namespace: "backstage",
     createNamespace: true,
-    repositoryOpts: {
-        repo: "https://charts.bitnami.com/bitnami",
-    },
+    // repositoryOpts: {
+    //     repo: "https://charts.bitnami.com/bitnami",
+    // },
     timeout: 120,
     maxHistory: 10,
     valueYamlFiles: [oauht2BackstageValueYamlAsset]
