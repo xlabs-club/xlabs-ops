@@ -4,6 +4,7 @@ import "./keycloak";
 import "./oauth2-proxy";
 import "./backstage";
 import "./argo-workflows";
+// import "./argo-events";
 // import "./argo-cd";
 import "./coredns-custom";
 import "./cdn";

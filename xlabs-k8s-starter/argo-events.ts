@@ -4,18 +4,6 @@ import * as ejs from "ejs";
 
 let config = new pulumi.Config();
 
-const ssoSecret = new kubernetes.core.v1.Secret("argo-workflows-sso", {
-    metadata: {
-        name: "argo-workflows-sso",
-        namespace: "argo",
-    },
-    stringData: {
-        "clientId": config.requireSecret("oauthClientID"),
-        "clientSecret": config.requireSecret("oauthClientSecret"),
-    },
-});
-
-
 const valueYamlAsset = pulumi.all(
     [
         config.requireSecret("globalPostgresPassword")
@@ -43,6 +31,5 @@ const argoEventsRelease = new kubernetes.helm.v3.Release("argo-events", {
     valueYamlFiles: [valueYamlAsset]
 });
 
-export const ssoSecretName = ssoSecret.metadata.name;
 export const argoEventsReleaseStatus = argoEventsRelease.status;
 
