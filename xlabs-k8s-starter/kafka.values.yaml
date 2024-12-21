@@ -1,0 +1,44 @@
+# 1073741824=1Gi
+extraConfig: |-
+  log.retention.bytes=53687091200
+  log.retention.bytes.per.topic=10737418240
+  log.retention.hours=168
+  log.segment.bytes=1073741824
+
+listeners:
+  client:
+    # 修改默认 protocol，某些客户端还不支持认证
+    protocol: PLAINTEXT
+
+controller:
+  replicaCount: 1
+  # false：部署出来的是 controller+broker 混布，true只部署controller
+  controllerOnly: false
+  extraEnvVars:
+    - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
+      value: "true"
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 256Mi
+    limits:
+      cpu: 2
+      memory: 1024Mi
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+  # 日志文件存储，单机模式不启用，高可用模式启用
+  logPersistence:
+    enabled: false
+
+broker:
+  ## Kafka broker-only nodes，单机模式采用controller+broker混合部署，不单独部署broker
+  replicaCount: 0
+
+metrics:
+  kafka:
+    enabled: false
+  serviceMonitor:
+    enabled: false

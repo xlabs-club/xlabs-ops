@@ -1,0 +1,99 @@
+common:
+  # image:
+  #   registry: ghcr.io
+  database:
+    jdbcUrl: ""
+    username: ""
+    password: ""
+  kafka:
+    bootstrapServers: "kafka.kafka.svc.cluster.local:9092"
+    topicPrefix: "hyades"
+
+apiServer:
+  enabled: true
+  annotations: {}
+  image: &apiServerImage
+    repository: dependencytrack/hyades-apiserver
+    tag: snapshot
+    pullPolicy: IfNotPresent
+  command: []
+  args: []
+  extraEnv: []
+  extraEnvFrom: []
+
+initializer:
+  enabled: false
+
+frontend:
+  enabled: true
+  replicaCount: 1
+  annotations: {}
+  image:
+    repository: dependencytrack/hyades-frontend
+    tag: snapshot
+    pullPolicy: IfNotPresent
+  command: []
+  args: []
+  extraEnv: []
+  extraEnvFrom: []
+  apiBaseUrl: ""
+
+mirrorService:
+  enabled: true
+  replicaCount: 1
+  annotations: {}
+  image:
+    repository: dependencytrack/hyades-mirror-service
+    tag: snapshot-native
+    pullPolicy: IfNotPresent
+  command: []
+  args: []
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+  initContainers: []
+
+notificationPublisher:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: dependencytrack/hyades-notification-publisher
+    tag: snapshot-native
+    pullPolicy: IfNotPresent
+  command: []
+  args: []
+
+repoMetaAnalyzer:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: dependencytrack/hyades-repository-meta-analyzer
+    tag: snapshot-native
+    pullPolicy: IfNotPresent
+  command: []
+  args: []
+
+vulnAnalyzer:
+  enabled: true
+  useStatefulSet: false
+  annotations: {}
+  replicaCount: 1
+  image:
+    repository: dependencytrack/hyades-vulnerability-analyzer
+    tag: snapshot-native
+    pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  tls: 
+    - secretName: <%= hostname %>-tls
+    hosts:
+    - <%= hostname %>
+  hostname: <%= hostname %>
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer

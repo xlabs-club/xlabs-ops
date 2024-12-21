@@ -1,6 +1,6 @@
 # xlabs-ops
 
-关于 DevOps, DataOps, FinOps 以及 AIOps 的平台工程实践。
+关于 DevOps, DataOps, FinOps 以及 AIOps 的平台工程实践，运维人员的自动化脚本库。
 
 项目结构介绍：
 

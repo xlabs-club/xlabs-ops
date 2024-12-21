@@ -6,5 +6,6 @@ import "./backstage";
 import "./argo-workflows";
 // import "./argo-events";
 // import "./argo-cd";
+import "./kafka";
 import "./coredns-custom";
 import "./cdn";
