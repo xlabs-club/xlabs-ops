@@ -1,0 +1,64 @@
+apiServer:
+  deploymentType: Deployment
+  resources:
+    requests:
+      cpu: "500m"
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+  extraEnv: 
+    - name: ALPINE_DATABASE_MODE
+      value: "external"
+    - name: ALPINE_DATABASE_URL
+      value: "jdbc:postgresql://postgresql.hyades.svc.cluster.local:5432/hyades"
+    - name: ALPINE_DATABASE_DRIVER
+      value: "org.postgresql.Driver"
+    - name: ALPINE_DATABASE_USERNAME
+      value: "hyades"
+    - name: ALPINE_DATABASE_PASSWORD
+      value: "<%= postgresPassword %>"
+    - name: ALPINE_DATABASE_POOL_ENABLED
+      value: "true"
+    - name: ALPINE_OIDC_ENABLED
+      value: "true"
+    - name: ALPINE_OIDC_ISSUER
+      value: "<%= keycloakBaseUrl %>/realms/devops"
+    - name: ALPINE_OIDC_CLIENT_ID
+      value: "dependencytrack"
+    - name: ALPINE_OIDC_USERNAME_CLAIM
+      value: "preferred_username"
+    - name: ALPINE_OIDC_USER_PROVISIONING
+      value: "true"
+
+frontend:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 150m
+      memory: 64Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  extraEnv: 
+    # 加了BASE_PATH静态资源404了
+    # - name: BASE_PATH
+    #   value: "/dtrack"
+    - name: OIDC_ISSUER
+      value: "<%= keycloakBaseUrl %>/realms/devops"
+    - name: OIDC_CLIENT_ID
+      value: "dependencytrack"
+    - name: OIDC_LOGIN_BUTTON_TEXT
+      value: "SSO"
+  apiBaseUrl: "https://<%= hostname %>"
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  tls: 
+    - secretName: <%= hostname %>-tls
+      hosts:
+      - <%= hostname %>
+  hostname: <%= hostname %>
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer

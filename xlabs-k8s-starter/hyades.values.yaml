@@ -1,13 +1,11 @@
 common:
-  # image:
-  #   registry: ghcr.io
   database:
-    jdbcUrl: ""
-    username: ""
-    password: ""
+    jdbcUrl: "jdbc:postgresql://postgresql.hyades.svc.cluster.local:5432/hyades"
+    username: "hyades"
+    password: "<%= postgresPassword %>"
   kafka:
     bootstrapServers: "kafka.kafka.svc.cluster.local:9092"
-    topicPrefix: "hyades"
+    # topicPrefix: "hyades"
 
 apiServer:
   enabled: true
@@ -92,8 +90,8 @@ ingress:
   ingressClassName: traefik
   tls: 
     - secretName: <%= hostname %>-tls
-    hosts:
-    - <%= hostname %>
+      hosts:
+      - <%= hostname %>
   hostname: <%= hostname %>
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-issuer

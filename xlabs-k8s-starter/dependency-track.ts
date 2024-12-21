@@ -5,7 +5,6 @@ import * as ejs from "ejs";
 
 let config = new pulumi.Config();
 
-
 const hyadesPgRelease = new kubernetes.helm.v3.Release("postgresql", {
     name: "postgresql",
     chart: "oci://registry-1.docker.io/bitnamicharts/postgresql",
@@ -31,17 +30,18 @@ const valueYamlAsset = pulumi.all(
     ])
     .apply(([postgrePwd]) => {
         const replaceVars = {
-            hostname: "hyades." + config.require("hostnameSuffix"),
+            hostname: "track." + config.require("hostnameSuffix"),
+            keycloakBaseUrl: "https://" + "iam." + config.require("hostnameSuffix"),
             postgresPassword: postgrePwd
         }
-        return new pulumi.asset.StringAsset(ejs.renderFile("./hyades.values.yaml", replaceVars));
+        return new pulumi.asset.StringAsset(ejs.renderFile("./dependency-track.values.yaml", replaceVars));
     });
 
 
-const hyadesRelease = new kubernetes.helm.v3.Release("hyades", {
-    name: "hyades",
-    chart: "hyades",
-    version: "0.10.0",
+const hyadesRelease = new kubernetes.helm.v3.Release("dependency-track", {
+    name: "dependency-track",
+    chart: "dependency-track",
+    version: "0.24.0",
     namespace: "hyades",
     createNamespace: true,
     timeout: 300,
