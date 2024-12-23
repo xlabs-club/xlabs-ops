@@ -8,6 +8,6 @@ import "./argo-workflows";
 // import "./argo-cd";
 // import "./kafka";
 // import "./hyades";
-import "./dependency-track";
+// import "./dependency-track";
 import "./coredns-custom";
 import "./cdn";

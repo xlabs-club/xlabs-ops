@@ -6,7 +6,7 @@ apiServer:
       memory: 1Gi
     limits:
       cpu: "2"
-      memory: 4Gi
+      memory: 6Gi
   extraEnv: 
     - name: ALPINE_DATABASE_MODE
       value: "external"
