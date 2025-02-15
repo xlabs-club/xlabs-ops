@@ -28,7 +28,7 @@ const oauth2ProxyRelease = new kubernetes.helm.v3.Release("oauth2-proxy", {
     name: "oauth2-proxy",
     // chart: "oauth2-proxy",
     chart: "oci://registry-1.docker.io/bitnamicharts/oauth2-proxy",
-    version: "6.1.1",
+    version: "6.2.7",
     namespace: "oauth2-proxy",
     createNamespace: true,
     // repositoryOpts: {

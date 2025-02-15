@@ -8,7 +8,7 @@ let config = new pulumi.Config();
 const certManagerRelease = new kubernetes.helm.v3.Release("cert-manager", {
     name: "cert-manager",
     chart: "cert-manager",
-    version: "1.16.1",
+    version: "1.17.1",
     namespace: "cert-manager",
     createNamespace: true,
     timeout: 300,
