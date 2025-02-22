@@ -6,21 +6,22 @@ backstage:
   image:
     registry: docker.io
     repository: nxest/xlabs-developer-platform
-    tag: dev-alpha-6
+    tag: 1.0.0-next-1
     pullPolicy: IfNotPresent
-    # pullPolicy: Always
 
   extraEnvVars:
     # Node.js 忽略 https 证书校验
     - name: NODE_TLS_REJECT_UNAUTHORIZED
       value: "0"
+    - name: ADMIN_TOKEN
+      value: "<%= adminToken %>"
 
   appConfig: 
     app:
-      title: xlabs developer platform
+      title: 卫星实验室
       baseUrl: <%= baseUrl %>
     organization:
-      name: XLabs
+      name: XLabs Club
 
     backend:
       baseUrl: <%= baseUrl %>
@@ -37,10 +38,15 @@ backstage:
       #     path:
       #      - /api/graphql/schema
       auth:
-        dangerouslyDisableDefaultAuthPolicy: true
-        keys:
-          # node -p 'require("crypto").randomBytes(24).toString("base64")'
-          - secret: 8Dv1Q7xdGcUbG+nuBL9RwGRd6dSesaTA
+        externalAccess:
+          - type: static
+            options:
+              token: ${ADMIN_TOKEN}
+              subject: admin-curl-access
+        # dangerouslyDisableDefaultAuthPolicy: true
+        # keys:
+        #   # node -p 'require("crypto").randomBytes(24).toString("base64")'
+        #   - secret: 8Dv1Q7xdGcUbG+nuBL9RwGRd6dSesaTA
 
     techdocs:
       builder: 'local'
@@ -76,12 +82,12 @@ backstage:
         pluginsWithPermission:
           - kubernetes
           - catalog
-      auth:
-        dangerouslyDisableDefaultAuthPolicy: true
-        # 这种配置方式已过时，切换到新的pluginKeyStore/externalAccess?
-        keys:
-          # node -p 'require("crypto").randomBytes(24).toString("base64")'
-          - secret: 8Dv1Q7xdGcUbG+nuBL9RwGRd6dSesaTA
+      # auth:
+      #   dangerouslyDisableDefaultAuthPolicy: true
+      #   # 这种配置方式已过时，切换到新的pluginKeyStore/externalAccess?
+      #   keys:
+      #     # node -p 'require("crypto").randomBytes(24).toString("base64")'
+      #     - secret: 8Dv1Q7xdGcUbG+nuBL9RwGRd6dSesaTA
 
     # proxy:
     #   endpoints:
@@ -101,19 +107,6 @@ backstage:
               # - resolver: forwardedUserMatchingUserEntityName
     catalog:
       providers:
-        # gitlab:
-        #   defaultProviderId:
-        #     host: git.my.com # Identifies one of the hosts set up in the integrations
-        #     branch: main # Optional. Used to discover on a specific branch
-        #     fallbackBranch: master # Optional. Fallback to be used if there is no default branch configured at the Gitlab repository. It is only used, if `branch` is undefined. Uses `master` as default
-        #     skipForkedRepos: false # Optional. If the project is a fork, skip repository
-        #     group: devops # Optional. Group and subgroup (if needed) to look for repositories. If not present the whole instance will be scanned
-        #     entityFilename: catalog-info.yaml # Optional. Defaults to `catalog-info.yaml`
-        #     projectPattern: '[\s\S]*' 
-        #     excludeRepos: [] 
-        #     schedule: 
-        #       frequency: { minutes: 30 }
-        #       timeout: { minutes: 3 }
         keycloakOrg:
           default:
             baseUrl: <%= keycloakBaseUrl %>
@@ -123,9 +116,9 @@ backstage:
             clientId: <%= backstageClientId %>
             clientSecret: <%= backstageClientSecret %>
             schedule:
-              frequency: { minutes: 15 }
+              frequency: { minutes: 60 }
               timeout: { minutes: 10 }
-              initialDelay: { minutes: 3 }
+              initialDelay: { minutes: 10 }
       rules:
         - allow: [Template, Component, System, Domain, API, Resource, Location, User, Group]
       # locations:

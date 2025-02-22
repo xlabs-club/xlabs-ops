@@ -12,15 +12,17 @@ const valueYamlAsset = pulumi.all(
     [
         config.requireSecret("globalPostgresPassword"),
         config.requireSecret("backstageClientId"),
-        config.requireSecret("backstageClientSecret")
+        config.requireSecret("backstageClientSecret"),
+        config.requireSecret("adminToken")
     ])
-    .apply(([password, clientId, clientSecret]) => {
+    .apply(([password, clientId, clientSecret, adminToken]) => {
         const replaceVars = {
             baseUrl: "https://" + hostname,
             keycloakBaseUrl: "https://" + "iam." + config.require("hostnameSuffix"),
             backstageClientId: clientId,
             backstageClientSecret: clientSecret,
-            postgresPassword: password
+            postgresPassword: password,
+            adminToken: adminToken
         }
         // 通过模板语法替换， <%= xxx %> 是ejs的语法
         const rendered = ejs.renderFile("./backstage.values.yaml", replaceVars);
@@ -31,7 +33,7 @@ const backstageRelease = new kubernetes.helm.v3.Release("backstage", {
     name: "backstage",
     chart: "backstage",
     // chart: "oci://ghcr.io/backstage/charts/backstage",
-    version: "2.2.0",
+    version: "2.3.1",
     namespace: "backstage",
     createNamespace: true,
     repositoryOpts: {
@@ -42,11 +44,10 @@ const backstageRelease = new kubernetes.helm.v3.Release("backstage", {
     valueYamlFiles: [valueYamlAsset]
 });
 
-
 const oauht2BackstageValueYamlAsset = pulumi.all(
     [
         config.requireSecret("oauthClientID"),
-        config.requireSecret("oauthClientSecret")
+        config.requireSecret("oauthClientSecret"),
     ])
     .apply(([clientID, clientSecret]) => {
         const replaceVars = {
@@ -64,7 +65,7 @@ const oauht2BackstageValueYamlAsset = pulumi.all(
 const oauth2ProxyBackstageRelease = new kubernetes.helm.v3.Release("backstage-oauth2-proxy", {
     name: "backstage-oauth2-proxy",
     chart: "oci://registry-1.docker.io/bitnamicharts/oauth2-proxy",
-    version: "6.2.7",
+    version: "6.2.8",
     namespace: "backstage",
     createNamespace: true,
     // repositoryOpts: {
