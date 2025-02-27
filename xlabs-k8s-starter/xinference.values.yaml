@@ -1,0 +1,107 @@
+# common used configurations
+config:
+  xinference_image: "xprobe/xinference:v1.3.0.post2-cpu"
+  curl_image: curlimages/curl:8.12.1
+  image_pull_policy: "IfNotPresent"
+  worker_num: 1
+  gpu_per_worker: ""
+  model_src: "modelscope"
+  persistence:
+    enabled: true
+    mountPath: "/data"
+  # any other environments
+  extra_envs: {}
+storageClass:
+  name: local-path
+  spec:
+    # place your configs here for the storage class
+    # provisioner: kubernetes.io/no-provisioner
+    volumeBindingMode: WaitForFirstConsumer
+pv:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    # actually no limit for local-path.
+    # if you want to change this, your storage class should support `resize`
+    storage: 20Gi
+  hostPath:
+    path: /tmp/xinference
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: "local-path"
+pvc:
+  accessModes:
+    # the volume can be mounted as read-write by many nodes.
+    - ReadWriteMany
+  sharedVolumeClaim:
+    storageRequest: 10Gi
+  storageClassName: "local-path"
+  volumeMode: ""
+serviceWeb:
+  ports:
+  # - nodePort: 30003
+  - port: 9997
+    protocol: TCP
+    targetPort: 9997
+  # change this to `LoadBalancer` if you use cloud platform
+  type: NodePort
+serviceSupervisor:
+  ports:
+  - name: service-supervisor-oscar
+    port: 9999
+    protocol: TCP
+    targetPort: 9999
+  - name: service-supervisor-web
+    port: 9997
+    protocol: TCP
+    targetPort: 9997
+  type: ClusterIP
+serviceWorker:
+  ports:
+  - port: 30001
+    protocol: TCP
+    targetPort: 30001
+  type: ClusterIP
+xinferenceSupervisor:
+  supervisor:
+    args:
+    - --port
+    - "9997"
+    - --host
+    - $(POD_IP)
+    - --supervisor-port
+    - "9999"
+    - --log-level
+    - debug
+    ports:
+      - containerPort: 9997
+        name: web
+      - containerPort: 9999
+        name: oscar
+    resources:
+      requests:
+        cpu: "1"
+        memory: 4Gi
+xinferenceWorker:
+  strategy:
+    type: Recreate
+  worker:
+    initContainers:
+      command: [ 'sh', '-c', "until curl -v http://service-supervisor:9997/v1/address; do echo waiting for supervisor; sleep 1; done" ]
+    args:
+    - -e
+    - http://service-supervisor:9997
+    - --host
+    - $(POD_IP)
+    - --worker-port
+    - "30001"
+    - --log-level
+    - debug
+    ports:
+      - containerPort: 30001
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
