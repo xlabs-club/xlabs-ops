@@ -2,7 +2,6 @@
 export * from "./cert-manager";
 import "./dify";
 import "./ollama";
-import "./xinference";
 import "./keycloak";
 import "./oauth2-proxy";
 import "./backstage";
