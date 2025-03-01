@@ -1,11 +1,11 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "0.15.3"
+    tag: "1.0.0"
     pullPolicy: IfNotPresent
   web:    
     repository: langgenius/dify-web
-    tag: "0.15.3"
+    tag: "1.0.0"
     pullPolicy: IfNotPresent
   sandbox:
     repository: langgenius/dify-sandbox
@@ -19,6 +19,11 @@ image:
   ssrfProxy:
     repository: ubuntu/squid
     tag: "6.10-24.10_edge"
+    pullPolicy: IfNotPresent
+
+  pluginDaemon:
+    repository: langgenius/dify-plugin-daemon
+    tag: 0.0.3-local
     pullPolicy: IfNotPresent
 
 api:
@@ -206,7 +211,39 @@ sandbox:
 ssrfProxy:
   enabled: false
   replicas: 1
-  
+
+
+pluginDaemon:
+  enabled: false
+  replicas: 1
+  extraEnv:
+  # Apply your own Environment Variables if necessary
+  # - name: LANG
+  #   value: "C.UTF-8"
+  service:
+    port: 5002
+  auth:
+    apiKey: "k1h2l2ifIekuvHHNi+Ofmm4xZ6cOeSi+JYvFse3lRmSkMybSTqv9UOk6"
+  database: "dify_plugin"
+  persistence:
+    mountPath: "/app/storage/cwd"
+    annotations:
+      helm.sh/resource-policy: keep
+    persistentVolumeClaim:
+      existingClaim: ""
+      ## Dify Plugin Daemon Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.
+      ## ReadWriteMany access mode required for `pluginDaemon`
+      ##
+      storageClass:
+      accessModes: ReadWriteOnce
+      size: 5Gi
+      subPath: ""
+
+
 postgresql:
   enabled: true
   name: postgres-dify
@@ -612,7 +649,6 @@ ingress:
     - secretName: <%= hostname %>-tls
       hosts:
         - <%= hostname %>
-
 
 
 redis:
