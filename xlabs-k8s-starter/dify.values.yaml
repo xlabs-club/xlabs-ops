@@ -188,7 +188,11 @@ web:
   # Apply your own Environment Variables if necessary
   - name: EDITION
     value: "SELF_HOSTED"
-
+  - name: MARKETPLACE_API_URL 
+    value: "https://marketplace.dify.ai"
+  - name: MARKETPLACE_URL 
+    value: "https://marketplace.dify.ai"
+    
 sandbox:
   enabled: true
   replicas: 1
