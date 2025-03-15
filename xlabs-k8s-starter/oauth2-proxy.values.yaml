@@ -68,12 +68,10 @@ initContainers:
       - mountPath: /bitnami/oauth2-proxy/templates
         name: templates
 
+externalRedis:
+  host: "redis-master.redis.svc"
+  password: "<%= redisPassword %>"
+  databaseIndex: 1
+
 redis:
-  enabled: true
-  global:
-    # imageRegistry: ""
-    redis:
-      password: "A4v5FWT6V7rCghcSgqF0jjNwYHU29"
-  master:
-    persistence:
-      enabled: false
+  enabled: false

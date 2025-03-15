@@ -9,7 +9,7 @@ knative:
 # Docker image
 image:
   # -- Docker image registry
-  repository: reg.firstshare.cn/docker.io.proxy/ollama/ollama
+  repository: ollama/ollama
 
   # -- Docker pull policy
   # pullPolicy: IfNotPresent

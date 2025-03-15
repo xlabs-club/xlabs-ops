@@ -6,13 +6,15 @@ let config = new pulumi.Config();
 
 const valueYamlAsset = pulumi.all(
     [
-        config.requireSecret("globalPostgresPassword")
+        config.requireSecret("globalPostgresPassword"),
+        config.requireSecret("redisPassword")
     ])
-    .apply(([postgrePwd]) => {
+    .apply(([postgrePwd, redisPassword]) => {
         const replaceVars = {
             hostname: "dify." + config.require("hostnameSuffix"),
             keycloakBaseUrl: "https://" + "iam." + config.require("hostnameSuffix"),
-            postgresPassword: postgrePwd
+            postgresPassword: postgrePwd,
+            redisPassword: redisPassword
         }
         return new pulumi.asset.StringAsset(ejs.renderFile("./dify.values.yaml", replaceVars));
     });
@@ -21,7 +23,7 @@ const valueYamlAsset = pulumi.all(
 const difyRelease = new kubernetes.helm.v3.Release("dify", {
     name: "dify",
     chart: "dify",
-    version: "0.23.0-rc1",
+    version: "0.23.0-rc3",
     namespace: "dify",
     createNamespace: true,
     timeout: 300,

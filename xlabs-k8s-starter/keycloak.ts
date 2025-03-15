@@ -25,14 +25,11 @@ const valueYamlAsset = pulumi.all(
 const keycloakRelease = new kubernetes.helm.v3.Release("keycloak", {
     name: "keycloak",
     chart: "oci://registry-1.docker.io/bitnamicharts/keycloak",
-    version: "24.4.11",
+    version: "24.4.13",
     namespace: "keycloak",
     createNamespace: true,
     timeout: 600,
     maxHistory: 10,
-    // repositoryOpts: {
-    //     repo: "https://charts.bitnami.com/bitnami",
-    // },
     valueYamlFiles: [valueYamlAsset]
 });
 

@@ -50,3 +50,5 @@ config:
     secure: v1:u04QlgTfzDw4Xs3R:06yBrjX9M27TWGaT07CYAdVeuzKs2uR6S13i7j7J2NVsdQQKX3Zqrgxth6dB6HLH
   xlabs-k8s-starter:adminToken:
     secure: v1:mZeyNdz9qegL155A:1OJd2XEEJorwqd9sdM6amQ8p/O508MjHf6VgeI4aTuJdNNSs1GRnOgVrK4dRzys3894wyArHNMY06TWEPbN89p4VLxrrD8Oq
+  xlabs-k8s-starter:redisPassword:
+    secure: v1:9aM2uX91F2MV/ffo:SwzBqF3IEKdPFH6KCp2n0xvut0uxw8AMOZ3U+piSUA==

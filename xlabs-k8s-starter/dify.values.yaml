@@ -1,11 +1,11 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.0.0"
+    tag: "1.0.1"
     pullPolicy: IfNotPresent
   web:    
     repository: langgenius/dify-web
-    tag: "1.0.0"
+    tag: "1.0.1"
     pullPolicy: IfNotPresent
   sandbox:
     repository: langgenius/dify-sandbox
@@ -23,7 +23,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.0.3-local
+    tag: 0.0.4-local
     pullPolicy: IfNotPresent
 
 api:
@@ -31,22 +31,16 @@ api:
   replicas: 1
   resources: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
-  # The direct approach
-  # - name: LANG
-  #   value: "C.UTF-8"
-  #   - name: SECRET_KEY
-  # Use existing k8s secrets
-  #  - name: DB_PASSWORD
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: my-secret
-  #        key: DB_PASSWORD
+  - name: TZ
+    value: "Asia/Shanghai"
+  - name: LOGIN_LOCKOUT_DURATION
+    value: "3600"
+  - name: LOGIN_MAX_ERROR_LIMITS
+    value: "10"
   - name: CHECK_UPDATE_URL
     # Won't check for update if left empty
-    # value: ""
-    value: https://updates.dify.ai
+    value: ""
+    # value: https://updates.dify.ai
   - name: CODE_MAX_NUMBER
     value: "9223372036854775807"
   - name: CODE_MIN_NUMBER
@@ -61,6 +55,8 @@ api:
     value: "30"
   - name: CODE_MAX_NUMBER_ARRAY_LENGTH
     value: "1000"
+  - name: NUMEXPR_MAX_THREADS
+    value: "16"
   service:
     port: 5001
     annotations: {}
@@ -87,6 +83,8 @@ api:
     # or download URL to the front-end or as a multi-modal model input;
     # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
     files: ""
+    marketplaceApi: "https://marketplace.dify.ai"
+    marketplace: "https://marketplace.dify.ai"
   mail:
     # default email sender from email address, if not not given specific address
     defaultSender: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
@@ -144,18 +142,12 @@ worker:
   replicas: 1
   resources: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
-  # The direct approach
-  # - name: LANG
-  #   value: "C.UTF-8"
-  #   - name: SECRET_KEY
-  # Use existing k8s secrets
-  #  - name: DB_PASSWORD
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: my-secret
-  #        key: DB_PASSWORD
+  - name: TZ
+    value: "Asia/Shanghai"
+  - name: LOGIN_LOCKOUT_DURATION
+    value: "3600"
+  - name: LOGIN_MAX_ERROR_LIMITS
+    value: "10"
   logLevel: INFO
   ## Dify Worker ServiceAccount configuration
   ##
@@ -185,21 +177,21 @@ web:
   enabled: true
   replicas: 1
   extraEnv:
-  # Apply your own Environment Variables if necessary
+  - name: TZ
+    value: "Asia/Shanghai"
   - name: EDITION
     value: "SELF_HOSTED"
-  - name: MARKETPLACE_API_URL 
-    value: "https://marketplace.dify.ai"
-  - name: MARKETPLACE_URL 
-    value: "https://marketplace.dify.ai"
+  # - name: MARKETPLACE_API_URL 
+  #   value: "https://marketplace.dify.ai"
+  # - name: MARKETPLACE_URL 
+  #   value: "https://marketplace.dify.ai"
     
 sandbox:
   enabled: true
   replicas: 1
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
+  - name: TZ
+    value: "Asia/Shanghai"
   - name: WORKER_TIMEOUT
     value: "15"
   service:
@@ -221,13 +213,30 @@ pluginDaemon:
   enabled: false
   replicas: 1
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
+  - name: TZ
+    value: "Asia/Shanghai"
+  - name: PLUGIN_INSTALLED_PATH
+    value: "/app/storage/cwd/plugins/plugin"
+  - name: PLUGIN_WORKING_PATH
+    value: "/app/storage/cwd/plugins/plugin-working"
+  - name: PERSISTENCE_STORAGE_PATH
+    value: "/app/storage/cwd/plugins/persistence"
+  - name: PLUGIN_STORAGE_LOCAL_ROOT
+    value: "/app/storage/cwd/plugins/plugin-root"
+  - name: PLUGIN_MAX_EXECUTION_TIMEOUT
+    value: "600"
+  - name: FORCE_VERIFYING_SIGNATURE
+    value: "false"
+  - name: PYTHON_ENV_INIT_TIMEOUT
+    value: "600"
+  - name: PIP_MIRROR_URL
+    value: "https://mirrors.aliyun.com/pypi/simple"
   service:
     port: 5002
   auth:
-    apiKey: "k1h2l2ifIekuvHHNi+Ofmm4xZ6cOeSi+JYvFse3lRmSkMybSTqv9UOk6"
+    serverKey: "eJjh8S8zsetQc1tb9P5ouwiFldgBB3uoWkLxm+V+5mrTccR2wgbq040A"
+    # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
+    difyApiKey: "aZTomSp7jaxJhhgE6fjfvoWAmMyVUqCgvCjlp5MPst8q7LrOpLZwLNHQ"
   database: "dify_plugin"
   persistence:
     mountPath: "/app/storage/cwd"
@@ -656,31 +665,16 @@ ingress:
 
 
 redis:
+  enabled: false
+  
+externalRedis:
   enabled: true
-  image:
-    registry: docker.io
-    repository: bitnami/redis
-    tag: 7.0.11-debian-11-r12
-    digest: ""
-    pullPolicy: IfNotPresent
+  host: "redis-master.redis.svc"
+  port: 6379
+  username: ""
+  password: "<%= redisPassword %>"
+  useSSL: false
 
-  architecture: standalone
-  ## Redis&reg; Authentication parameters
-  ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
-  ##
-  auth:
-    enabled: true
-    sentinel: false
-    password: "difyai54321"
-
-  ## @param commonConfiguration [string] Common configuration to be added into the ConfigMap
-  ## ref: https://redis.io/topics/config
-  ##
-  commonConfiguration: |-
-    # Enable AOF https://redis.io/topics/persistence#append-only-file
-    appendonly yes
-    # Disable RDB persistence, AOF persistence already enabled.
-    save ""
 
 ###################################
 # External postgres
