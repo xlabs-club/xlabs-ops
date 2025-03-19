@@ -23,7 +23,7 @@ const valueYamlAsset = pulumi.all(
 const difyRelease = new kubernetes.helm.v3.Release("dify", {
     name: "dify",
     chart: "dify",
-    version: "0.23.0-rc3",
+    version: "0.23.0-rc4",
     namespace: "dify",
     createNamespace: true,
     timeout: 300,
