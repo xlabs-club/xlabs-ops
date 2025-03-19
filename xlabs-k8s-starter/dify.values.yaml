@@ -210,7 +210,7 @@ ssrfProxy:
 
 
 pluginDaemon:
-  enabled: false
+  enabled: true
   replicas: 1
   extraEnv:
   - name: TZ
@@ -232,7 +232,10 @@ pluginDaemon:
   - name: PIP_MIRROR_URL
     value: "https://mirrors.aliyun.com/pypi/simple"
   service:
-    port: 5002
+    ports:
+      daemon: 5002
+      # Leave it unspecified in order NOT to expose port for remote installation as a `Service`.
+      pluginInstall: 5003
   auth:
     serverKey: "eJjh8S8zsetQc1tb9P5ouwiFldgBB3uoWkLxm+V+5mrTccR2wgbq040A"
     # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
@@ -255,7 +258,12 @@ pluginDaemon:
       accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
-
+  marketplace:
+    enabled: true
+    # Takes effect only if built-in `nginx` were enabled
+    # If enabled, route marketplace api call to built-in `nginx` and strip headers for tracking.
+    # https://github.com/BorisPolonsky/dify-helm/pull/131
+    apiProxyEnabled: false
 
 postgresql:
   enabled: true
