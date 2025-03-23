@@ -1,11 +1,11 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.1.0"
+    tag: "1.1.2"
     pullPolicy: IfNotPresent
   web:    
     repository: langgenius/dify-web
-    tag: "1.1.0"
+    tag: "1.1.2"
     pullPolicy: IfNotPresent
   sandbox:
     repository: langgenius/dify-sandbox
@@ -23,7 +23,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.0.5-local
+    tag: 0.0.6-local
     pullPolicy: IfNotPresent
 
 api:
@@ -215,14 +215,14 @@ pluginDaemon:
   extraEnv:
   - name: TZ
     value: "Asia/Shanghai"
-  - name: PLUGIN_INSTALLED_PATH
-    value: "/app/storage/cwd/plugins/plugin"
-  - name: PLUGIN_WORKING_PATH
-    value: "/app/storage/cwd/plugins/plugin-working"
-  - name: PERSISTENCE_STORAGE_PATH
-    value: "/app/storage/cwd/plugins/persistence"
-  - name: PLUGIN_STORAGE_LOCAL_ROOT
-    value: "/app/storage/cwd/plugins/plugin-root"
+  # - name: PLUGIN_INSTALLED_PATH
+  #   value: "/app/storage/cwd/plugins/plugin"
+  # - name: PLUGIN_WORKING_PATH
+  #   value: "/app/storage/cwd/plugins/plugin-working"
+  # - name: PERSISTENCE_STORAGE_PATH
+  #   value: "/app/storage/cwd/plugins/persistence"
+  # - name: PLUGIN_STORAGE_LOCAL_ROOT
+  #   value: "/app/storage/cwd/plugins/plugin-root"
   - name: PLUGIN_MAX_EXECUTION_TIMEOUT
     value: "600"
   - name: FORCE_VERIFYING_SIGNATURE
@@ -242,7 +242,7 @@ pluginDaemon:
     difyApiKey: "aZTomSp7jaxJhhgE6fjfvoWAmMyVUqCgvCjlp5MPst8q7LrOpLZwLNHQ"
   database: "dify_plugin"
   persistence:
-    mountPath: "/app/storage/cwd"
+    mountPath: "/app/storage"
     annotations:
       helm.sh/resource-policy: keep
     persistentVolumeClaim:
