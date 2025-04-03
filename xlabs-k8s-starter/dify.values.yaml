@@ -1,15 +1,15 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.1.2"
+    tag: "1.1.3"
     pullPolicy: IfNotPresent
   web:    
     repository: langgenius/dify-web
-    tag: "1.1.2"
+    tag: "1.1.3"
     pullPolicy: IfNotPresent
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.10"
+    tag: "0.2.11"
     pullPolicy: IfNotPresent
   proxy:
     repository: nginx
