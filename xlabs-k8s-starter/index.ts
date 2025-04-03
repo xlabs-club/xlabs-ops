@@ -7,7 +7,7 @@ import "./keycloak";
 import "./oauth2-proxy";
 import "./backstage";
 import "./argo-workflows";
-// import "./argo-events";
+import "./argo-events";
 // import "./argo-cd";
 // import "./kafka";
 // import "./hyades";

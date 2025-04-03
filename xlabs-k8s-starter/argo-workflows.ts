@@ -33,13 +33,14 @@ const valueYamlAsset = pulumi.all(
 const argoRelease = new kubernetes.helm.v3.Release("argo-workflows", {
     name: "argo-workflows",
     chart: "oci://registry-1.docker.io/bitnamicharts/argo-workflows",
-    version: "11.1.7",
+    version: "11.1.11",
     namespace: "argo",
     createNamespace: true,
     timeout: 300,
     maxHistory: 10,
     valueYamlFiles: [valueYamlAsset]
 });
+
 
 export const ssoSecretName = ssoSecret.metadata.name;
 export const argoWorkflowsReleaseStatus = argoRelease.status;

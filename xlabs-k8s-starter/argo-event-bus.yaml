@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventBus
+metadata:
+  name: argo-event-bus
+  namespace: argo
+spec:
+  jetstream:
+    version: 2.10.10
+    replicas: 1
+    persistence: # optional
+        storageClassName: local-path
+        accessMode: ReadWriteOnce
+        volumeSize: 10Gi
+    # see default values in argo-events-controller-config
+    streamConfig: |             
+      maxAge: 24h
+    settings: |
+      max_file_store: 1GB
+    # startArgs:
+    #   - "-D"                    # debug-level logs
