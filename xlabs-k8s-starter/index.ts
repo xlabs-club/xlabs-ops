@@ -14,3 +14,4 @@ import "./argo-events";
 // import "./dependency-track";
 import "./coredns-custom";
 import "./cdn";
+import "./postgresql";
