@@ -17,7 +17,13 @@ const certManagerRelease = new kubernetes.helm.v3.Release("cert-manager", {
         repo: "https://charts.jetstack.io",
     },
     values: {
-        installCRDs: true,
+        crds: { enabled: true },
+        config: {
+            apiVersion: "controller.config.cert-manager.io/v1alpha1",
+            kind: "ControllerConfiguration",
+            // 启用 Gateway API，需要现在集群中安装 Gateway API CRDs
+            enableGatewayAPI: true,
+        },
     },
 });
 
