@@ -5,7 +5,7 @@ import * as ejs from "ejs";
 let config = new pulumi.Config();
 
 // ingress hostname
-const hostname = "app." + config.require("hostnameSuffix");
+const hostname = "dash." + config.require("hostnameSuffix");
 
 //  在pulumi里requireSecret是一种特殊的类型 Output<String>，Output无法直接用于String替换，详情参考apply说明
 const valueYamlAsset = pulumi.all(
@@ -18,7 +18,7 @@ const valueYamlAsset = pulumi.all(
     .apply(([password, clientId, clientSecret, adminToken]) => {
         const replaceVars = {
             baseUrl: "https://" + hostname,
-            keycloakBaseUrl: "https://" + "iam." + config.require("hostnameSuffix"),
+            keycloakBaseUrl: "https://" + "sso." + config.require("hostnameSuffix"),
             backstageClientId: clientId,
             backstageClientSecret: clientSecret,
             postgresPassword: password,
